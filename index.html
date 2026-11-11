@@ -1,0 +1,1007 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" id="tc" content="#0b0b0c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Envies">
+<meta name="referrer" content="no-referrer">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="manifest" href="manifest.webmanifest">
+<title>Envies</title>
+<style>
+/* ---------- thème (sombre, titres en italique) ---------- */
+body{--bg:#0b0b0c;--surface:#161618;--surface2:#1f1f22;--line:#2a2a2e;--txt:#f2f2f3;--mut:#8e8e96;--dim:#5f5f66;--acc:#f2f2f3;--accT:#0b0b0c;--r:14px;--navbg:rgba(30,30,34,.82);--serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:15px;line-height:1.35;-webkit-font-smoothing:antialiased}
+body.noscroll{overflow:hidden}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;background:none;border:0;padding:0}
+a{color:inherit}
+:focus-visible{outline:2px solid #fff;outline-offset:2px}
+svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.main{max-width:1280px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 14px) 12px calc(env(safe-area-inset-bottom) + 100px)}
+.mut{color:var(--mut)} .mini{font-size:12.5px;color:var(--mut)} .num{font-variant-numeric:tabular-nums} .sp{flex:1}
+
+/* en-tête */
+.hd{display:flex;align-items:center;gap:12px;margin:2px 2px 16px}
+.av{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#2338ff,#1a1ad0 60%,#5b2bff);color:#fff;display:grid;place-items:center;font-family:var(--serif);font-style:italic;font-size:22px;flex:none;overflow:hidden;text-transform:lowercase}
+.av img{width:100%;height:100%;object-fit:cover}
+.hd .who{flex:1;min-width:0}
+.hd .nm{font-size:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hd .sub{font-size:12px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ib{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:var(--txt);flex:none}
+.ib:hover{background:var(--surface2)}
+.h1{font-size:30px;margin:6px 2px 4px}
+.lead{color:var(--mut);margin:0 2px 18px;font-size:14px}
+
+/* onglets de listes + barre d'outils */
+.chips{display:flex;gap:18px;align-items:center;overflow-x:auto;scrollbar-width:none;margin:0 2px 10px;padding-bottom:2px}
+.chips::-webkit-scrollbar{display:none}
+.chip{background:none;border:0;border-bottom:1px solid transparent;border-radius:0;padding:4px 0;color:var(--mut);white-space:nowrap;font-size:15px}
+.chip.on{color:var(--txt);border-color:var(--txt)}
+.chip .n{opacity:.55;margin-left:5px;font-size:12px}
+.bar{display:flex;align-items:center;gap:12px;margin:0 2px 14px}
+.sel{appearance:none;-webkit-appearance:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%238e8e96' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right center;border:0;color:var(--mut);padding:4px 16px 4px 0;font-size:14px;max-width:34vw;text-overflow:ellipsis;cursor:pointer;min-width:0}
+.sel:focus{outline:0;color:var(--txt)}
+.sel option{background:#1f1f22;color:#f2f2f3}
+.bar .chip{font-size:14px}
+.plus{width:42px;height:38px;border-radius:10px;background:var(--acc);color:var(--accT);display:grid;place-items:center;flex:none}
+.plus svg{width:20px;height:20px;stroke-width:2}
+.search{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:0 12px;min-height:42px;margin:0 2px 14px;color:var(--dim)}
+.search input{flex:1;min-width:0;border:0;background:none;outline:0;padding:9px 0;color:var(--txt)}
+.search input::placeholder{color:var(--dim)}
+.search input::-webkit-search-cancel-button{display:none}
+
+/* grille façon pinterest */
+.grid{display:flex;gap:10px;align-items:flex-start}
+.grid .col{flex:1;min-width:0;display:flex;flex-direction:column;gap:10px}
+.card{margin:0;background:var(--surface);border-radius:var(--r);overflow:hidden;cursor:pointer;position:relative;transition:transform .12s;display:block}
+.card:hover{transform:translateY(-2px)}
+.card .im{background:#fff;display:block}
+.card .im img{display:block;width:100%;height:auto}
+.card .im .ph,.card .im.ph{aspect-ratio:1/1;background:linear-gradient(135deg,#25252a,#18181b);display:grid;place-items:center;font-family:var(--serif);font-style:italic;font-size:46px;color:var(--dim);width:100%}
+.card .meta{padding:10px 11px 12px}
+.card .by{font-size:11px;color:var(--mut);margin-bottom:5px}
+.card .by b{color:var(--txt);font-weight:500}
+.card .shop{font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--dim);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .ttl{font-family:var(--serif);font-size:14px;line-height:1.25;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.card .pr{font-family:var(--serif);font-style:italic;font-size:14px;margin-top:6px}
+.card .pr.na{color:var(--dim);font-size:12px}
+.ph{width:100%;height:100%;display:grid;place-items:center;font-family:var(--serif);font-style:italic;font-size:40px;color:var(--dim);background:var(--surface2)}
+.badge{position:absolute;top:8px;right:8px;z-index:1;font-size:11px;padding:3px 9px;border-radius:99px;background:rgba(111,207,151,.92);color:#08210f}
+.badge.done{left:8px;right:auto;background:rgba(11,11,12,.78);color:#f2f2f3;backdrop-filter:blur(6px)}
+.is-done{opacity:.45}
+
+/* barre d'onglets flottante */
+.tabbar{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 14px);transform:translateX(-50%);display:flex;gap:2px;padding:5px;background:var(--navbg);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.07);border-radius:99px;z-index:20}
+.tabbar button{padding:10px 20px;border-radius:99px;color:var(--mut)}
+.tabbar button.on{color:var(--txt);background:rgba(255,255,255,.1)}
+
+/* communs */
+.empty{text-align:center;padding:50px 20px;color:var(--mut)}
+.empty h3{font-weight:700;font-size:22px;color:var(--txt);margin:0 0 8px}
+.empty p{margin:0 auto 18px;max-width:430px;font-size:14px}
+.empty .btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.note{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;margin:0 0 14px;font-size:14px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 18px;border-radius:12px;background:var(--acc);color:var(--accT);font-weight:600;text-decoration:none;white-space:nowrap}
+.btn svg{width:18px;height:18px}
+.btn.ghost{background:var(--surface2);color:var(--txt)}
+.btn.block{display:flex;width:100%}
+.btn.sm{min-height:34px;padding:0 13px;font-size:14px;border-radius:99px}
+.btn[disabled]{opacity:.5;pointer-events:none}
+.link{text-decoration:underline;text-underline-offset:3px;color:var(--txt);text-align:left}
+.link.bad{color:#e5484d}.link.dim{color:var(--mut)}
+.seg{display:flex;background:var(--surface2);border-radius:12px;padding:3px;gap:2px}
+.seg button{flex:1;padding:9px 6px;border-radius:9px;color:var(--mut);font-size:14px}
+.seg button.on{background:var(--surface);color:var(--txt);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+
+/* feuilles */
+.sb{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,0);display:flex;align-items:flex-end;justify-content:center;transition:background .2s}
+.sb.on{background:rgba(0,0,0,.5)}
+.sheet{width:100%;max-width:560px;max-height:92vh;max-height:92dvh;overflow:auto;overscroll-behavior:contain;background:var(--surface);color:var(--txt);border-radius:22px 22px 0 0;padding:8px 20px calc(env(safe-area-inset-bottom) + 22px);transform:translateY(40px);opacity:0;transition:transform .22s,opacity .2s;-webkit-overflow-scrolling:touch}
+.sb.on .sheet{transform:none;opacity:1}
+@media(min-width:700px){.sb{align-items:center}.sheet{border-radius:20px;padding-bottom:24px}}
+.grab{width:40px;height:4px;border-radius:9px;background:var(--line);margin:2px auto 14px}
+.sheet h2{font-weight:800;font-size:24px;letter-spacing:-.01em;text-align:center;margin:4px 0 4px}
+.sheet .hint{text-align:center;color:var(--mut);font-size:13.5px;margin:0 0 16px}
+.pimg{background:#fff;border-radius:14px;display:grid;place-items:center;overflow:hidden;margin:4px 0 14px;border:1px solid var(--line)}
+.pimg img{display:block;max-width:100%;max-height:42vh;object-fit:contain}
+.pimg .ph{aspect-ratio:4/3;font-size:64px}
+.thumbs{display:flex;gap:8px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none}
+.thumbs::-webkit-scrollbar{display:none}
+.thumbs img{width:60px;height:60px;object-fit:contain;background:#fff;border-radius:10px;border:2px solid var(--line);flex:none;cursor:pointer}
+.thumbs img.on{border-color:var(--acc)}
+.lbl{font-size:12px;font-weight:600;color:var(--mut);margin:12px 0 6px}
+.fld{width:100%;background:var(--surface2);border:1px solid transparent;border-radius:12px;padding:11px 13px;min-height:46px;color:var(--txt)}
+.fld:focus{outline:0;border-color:var(--acc)}
+.fld::placeholder{color:var(--dim)}
+select.fld{-webkit-appearance:none;appearance:none}
+.frow{display:flex;gap:10px}
+.frow>*{flex:1;min-width:0}
+.frow>.w1{flex:.55}
+.actions{display:flex;gap:10px;margin-top:18px}
+.actions>*{flex:1}
+.paste{display:flex;gap:10px;align-items:center}
+.paste .fld{flex:1}
+.reading{display:flex;gap:10px;justify-content:center;align-items:center;color:var(--mut);padding:34px 0}
+.spin{width:16px;height:16px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--acc);animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.dshop{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin:4px 0 4px}
+.dtitle{font-weight:700;font-size:22px;line-height:1.2;margin:0 0 8px}
+.dprice{font-weight:800;font-size:20px}
+.dprice small{font-weight:400;font-size:12.5px;color:var(--mut);margin-left:8px}
+.dnote{background:var(--surface2);border-radius:12px;padding:10px 12px;margin:12px 0 0;white-space:pre-wrap;word-break:break-word;font-size:14px}
+.links{display:flex;flex-direction:column;gap:12px;align-items:flex-start;margin-top:18px}
+.pick{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:13px 4px;border-bottom:1px solid var(--line)}
+.pick .dot{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--mut);flex:none}
+.pick.on .dot{border-color:var(--acc);background:var(--acc);box-shadow:inset 0 0 0 3px var(--surface)}
+.person{display:flex;align-items:center;gap:12px;padding:10px 2px}
+.person .t{flex:1;min-width:0}
+.person .t b{display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.person .t span{font-size:12.5px;color:var(--mut)}
+.sec{font-size:11.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);margin:20px 2px 8px}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 90px);transform:translateX(-50%);background:var(--txt);color:var(--bg);padding:10px 16px;border-radius:14px;z-index:99;font-size:14px;max-width:90vw;width:max-content;text-align:center;box-shadow:0 8px 30px rgba(0,0,0,.3)}
+.err{color:#e5484d;font-size:13px;margin:10px 0 0;min-height:18px}
+body.drop::after{content:"Lâche le lien ici pour l’ajouter";position:fixed;inset:12px;border:3px dashed var(--acc);border-radius:20px;background:rgba(128,128,128,.25);display:grid;place-items:center;font-size:22px;font-weight:800;color:var(--txt);z-index:90;pointer-events:none}
+/* titres en italique */
+.h1,.hd .nm,.sheet h2,.dtitle,.empty h3{font-family:var(--serif);font-style:italic;font-weight:400}
+.sheet h2{font-size:28px}.dtitle{font-size:26px}.empty h3{font-size:26px}
+.dprice{font-family:var(--serif);font-style:italic;font-weight:400}
+.dprice small{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-style:normal}
+.dshop{color:var(--mut)}
+.sheet{background:#111113}
+.btn.ghost{background:var(--surface2)}
+.pick.on .dot{box-shadow:inset 0 0 0 3px #111113}
+.toast{background:#fff;color:#000}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+/* =====================================================================
+   RÉGLAGES — à remplir une seule fois. Ces valeurs sont PUBLIQUES par
+   conception : la sécurité vient des règles du fichier supabase-schema.sql
+   ===================================================================== */
+const CFG = {
+  APP_NAME: 'Envies',
+  SUPABASE_URL: '',        // ex. https://abcdxyz.supabase.co
+  SUPABASE_ANON_KEY: '',   // clé « publishable / anon »  (JAMAIS la « secret / service_role »)
+  META_RELAY: '',          // facultatif : adresse du relais Cloudflare (worker-meta.js)
+};
+
+/* ---------- outils ---------- */
+const lsGet = k => { try { return localStorage.getItem(k); } catch { return null; } };
+const lsSet = (k, v) => { try { if (v == null || v === '') localStorage.removeItem(k); else localStorage.setItem(k, v); return true; } catch { return false; } };
+const cfg = k => CFG[k] || lsGet('envies.cfg.' + k) || '';
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
+const uid = () => (crypto.randomUUID ? crypto.randomUUID() : 'id' + Date.now() + Math.random().toString(16).slice(2));
+const CUR = {EUR: '€', USD: '$', GBP: '£', CHF: 'CHF', CAD: 'CA$', JPY: '¥'};
+const money = (p, c = 'EUR') => p == null || p === '' || isNaN(p) ? '' : Number(p).toLocaleString('fr-FR', {minimumFractionDigits: Number(p) % 1 ? 2 : 0, maximumFractionDigits: 2}) + ' ' + (CUR[c] || c);
+const host = u => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch { return ''; } };
+const fdate = d => { const x = d ? new Date(d) : null; return x && !isNaN(x) ? x.toLocaleDateString('fr-FR', {day: 'numeric', month: 'long', year: 'numeric'}) : ''; };
+const norm = s => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+const isHandle = h => /^[a-z0-9_.]{3,24}$/.test(h);
+// sécurité : on n'ouvre que des liens http(s), on n'affiche que des images http(s) ou data:image
+const safeHref = u => /^https?:\/\/[^\s]+$/i.test(String(u || '').trim()) ? String(u).trim() : '';
+const safeImg = u => { u = String(u || '').trim(); if (/^data:image\//i.test(u)) return u; if (/^https?:\/\//i.test(u)) return u.replace(/^http:\/\//i, 'https://'); if (/^\/\//.test(u)) return 'https:' + u; return ''; };
+function extractUrl(s) {
+  s = String(s || '').trim(); if (!s) return '';
+  const m = s.match(/https?:\/\/[^\s<>"']+/i);
+  let u = m ? m[0] : (/^[\w-]+(\.[\w-]+)+(\/\S*)?$/.test(s) ? 'https://' + s : '');
+  u = u.replace(/[),.;!?»]+$/, '');
+  try { const x = new URL(u); return x.hostname.includes('.') ? x.href : ''; } catch { return ''; }
+}
+// « 1 299,90 » → 1299.9 ; « 1.299,90 » → 1299.9 ; « 1,299.90 » → 1299.9 ; « 89,9 » → 89.9
+function parsePrice(v) {
+  let s = String(v ?? '').replace(/[\s  ']/g, '').replace(/[^\d.,]/g, '');
+  if (!s) return null;
+  const c = s.lastIndexOf(','), d = s.lastIndexOf('.');
+  if (c > -1 && d > -1) s = c > d ? s.replace(/\./g, '').replace(',', '.') : s.replace(/,/g, '');
+  else if (c > -1) { const p = s.split(','); s = (p.length === 2 && p[1].length !== 3) ? p.join('.') : p.join(''); }
+  else if (d > -1) { const p = s.split('.'); if (p.length > 2) s = p.slice(0, -1).join('') + '.' + p[p.length - 1]; }
+  const n = parseFloat(s); return isNaN(n) || n < 0 ? null : Math.round(n * 100) / 100;
+}
+function friendlyErr(e) {
+  const m = String((e && e.message) || e || '');
+  if (/Failed to fetch|NetworkError|Load failed|network|Impossible de charger Supabase/i.test(m)) return 'Impossible de joindre le serveur. Vérifie ta connexion. Si ça dure, ton projet Supabase est peut-être en pause : supabase.com → ton projet → Restore.';
+  if (/JWT|expired|refresh_token|invalid claim/i.test(m)) return 'Ta session a expiré : reconnecte-toi.';
+  if (/duplicate key/i.test(m)) return 'C’est déjà fait.';
+  if (/row-level security|permission denied|violates check/i.test(m)) return 'Le serveur a refusé cette action (donnée invalide ou pas le droit).';
+  if (/does not exist|Could not find the table|schema cache/i.test(m)) return 'Les tables n’existent pas encore : as-tu exécuté supabase-schema.sql ?';
+  if (/Email not confirmed/i.test(m)) return 'Confirme d’abord ton e-mail (clique sur le lien reçu).';
+  if (/Invalid login/i.test(m)) return 'E-mail ou mot de passe incorrect.';
+  if (/already registered/i.test(m)) return 'Un compte existe déjà avec cet e-mail : connecte-toi.';
+  if (/rate limit|too many/i.test(m)) return 'Trop d’essais : attends quelques minutes.';
+  if (/Invalid API key|No API key/i.test(m)) return 'Clé Supabase invalide : vérifie les réglages.';
+  return m || 'Erreur inconnue';
+}
+function keyProblem(key) {
+  key = String(key || '');
+  if (/^sb_secret_/i.test(key)) return 'C’est la clé SECRÈTE : ne la mets jamais dans l’appli. Prends la clé « publishable » (ou « anon »).';
+  const p = key.split('.');
+  if (p.length === 3) { try { const j = JSON.parse(atob(p[1].replace(/-/g, '+').replace(/_/g, '/'))); if (j.role === 'service_role') return 'C’est la clé « service_role » (secrète) : ne la mets jamais dans l’appli. Prends la clé « anon ».'; } catch {} }
+  return '';
+}
+const cleanSbUrl = u => String(u || '').trim().replace(/\/+$/, '').replace(/\/(rest|auth)\/v1.*$/i, '');
+let toastT;
+function toast(msg, ms = 2800) {
+  $$('.toast').forEach(t => t.remove());
+  const t = document.createElement('div'); t.className = 'toast'; t.setAttribute('role', 'status'); t.textContent = msg; document.body.appendChild(t);
+  clearTimeout(toastT); toastT = setTimeout(() => t.remove(), ms);
+}
+async function copyText(t) {
+  try { await navigator.clipboard.writeText(t); return true; } catch {}
+  const a = document.createElement('textarea'); a.value = t; document.body.appendChild(a); a.select();
+  let ok = false; try { ok = document.execCommand('copy'); } catch {} a.remove(); return ok;
+}
+async function shareLink(title, url) {
+  if (navigator.share) { try { await navigator.share({title, url}); return; } catch (e) { if (e.name === 'AbortError') return; } }
+  toast(await copyText(url) ? 'Lien copié' : url);
+}
+function resizeImage(file, max = 560) {
+  return new Promise((res, rej) => {
+    const r = new FileReader(); r.onerror = rej;
+    r.onload = () => {
+      const im = new Image(); im.onerror = rej;
+      im.onload = () => {
+        const k = Math.min(1, max / Math.max(im.width, im.height));
+        const c = document.createElement('canvas'); c.width = Math.max(1, Math.round(im.width * k)); c.height = Math.max(1, Math.round(im.height * k));
+        const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); g.drawImage(im, 0, 0, c.width, c.height);
+        res(c.toDataURL('image/jpeg', .72));
+      };
+      im.src = r.result;
+    };
+    r.readAsDataURL(file);
+  });
+}
+const I = {
+  plus: '<svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
+  search: '<svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>',
+  share: '<svg class="i" viewBox="0 0 24 24"><path d="M12 3v12M8 7l4-4 4 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/></svg>',
+  menu: '<svg class="i" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>',
+  back: '<svg class="i" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>',
+  x: '<svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  check: '<svg class="i" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  ext: '<svg class="i" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1h5"/></svg>',
+  heart: '<svg class="i" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 017-2.6A4 4 0 0119 10c0 5.6-7 10-7 10z"/></svg>',
+  home: '<svg class="i" viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v8a1 1 0 01-1 1h-4v-6H9v6H5a1 1 0 01-1-1z"/></svg>',
+  users: '<svg class="i" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0113 0M16 4.5a3.5 3.5 0 010 7M18 14a6 6 0 013.5 6"/></svg>',
+  user: '<svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0"/></svg>',
+  list: '<svg class="i" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01"/></svg>',
+};
+
+/* =====================================================================
+   LECTURE D'UNE PAGE PRODUIT (relais perso → microlink → à la main)
+   ===================================================================== */
+async function getJson(u, ms = 9000) {
+  const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), ms);
+  try { const r = await fetch(u, {signal: ctl.signal}); if (!r.ok) throw new Error('HTTP ' + r.status); return await r.json(); }
+  finally { clearTimeout(t); }
+}
+async function fetchMeta(url) {
+  const relay = cfg('META_RELAY');
+  if (relay) {
+    try {
+      const j = await getJson(relay + (relay.includes('?') ? '&' : '?') + 'url=' + encodeURIComponent(url));
+      if (j && (j.title || (j.images && j.images.length))) {
+        return {title: j.title || '', brand: j.brand || '', shop: j.shop || host(url), price: parsePrice(j.price), currency: j.currency || 'EUR',
+                images: [...new Set((j.images || []).map(safeImg).filter(Boolean))].slice(0, 12), via: 'relay'};
+      }
+    } catch (e) { console.warn('relais', e); }
+  }
+  try {
+    const j = await getJson('https://api.microlink.io/?url=' + encodeURIComponent(url));
+    if (j && j.status === 'success' && j.data) {
+      const d = j.data;
+      return {title: d.title || '', brand: '', shop: host(url), price: null, currency: 'EUR',
+              images: [d.image && d.image.url, d.logo && d.logo.url].map(safeImg).filter(Boolean), via: 'microlink'};
+    }
+  } catch (e) { console.warn('microlink', e); }
+  return null;
+}
+
+/* =====================================================================
+   STOCKAGE 1 : local (cet appareil seulement)
+   ===================================================================== */
+const DEMO = [
+  ['Veste imperméable à capuche', 'Marque A', 'boutique-a.fr', 150, '#1f2937'],
+  ['Baskets de running', 'Marque B', 'sport-b.com', 108, '#94a3b8'],
+  ['Huile à barbe cèdre', 'Marque C', 'soin-c.fr', 13, '#4d7c0f'],
+  ['Casque audio sans fil', 'Marque D', 'tech-d.com', 249.9, '#334155'],
+  ['Montre minimaliste', '', 'montres-e.fr', 89, '#b45309'],
+  ['Livre de photographie', '', 'librairie-f.fr', 32, '#9f1239'],
+];
+const demoImg = c => 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400'><rect width='400' height='400' fill='#f4f4f5'/><rect x='110' y='110' width='180' height='180' rx='46' fill='${c}'/></svg>`);
+function makeLocalStore() {
+  const KEY = 'envies.local.v1';
+  const load = () => { try { const d = JSON.parse(lsGet(KEY) || 'null'); return {wishes: Array.isArray(d && d.wishes) ? d.wishes : [], lists: Array.isArray(d && d.lists) ? d.lists : []}; } catch { return {wishes: [], lists: []}; } };
+  const save = d => { try { localStorage.setItem(KEY, JSON.stringify(d)); } catch { throw new Error('La mémoire de cet appareil est pleine : retire quelques photos importées de la pellicule, ou crée un compte.'); } };
+  return {
+    kind: 'local', social: false,
+    async init() { return {me: {id: 'local', handle: 'moi', name: 'Mes envies'}}; },
+    async myWishes() { return load().wishes; },
+    async saveWish(w) {
+      const d = load();
+      if (w.id) { const i = d.wishes.findIndex(x => x.id === w.id); if (i >= 0) { d.wishes[i] = {...d.wishes[i], ...w}; save(d); return d.wishes[i]; } }
+      const n = {...w, id: uid(), owner_id: 'local', created_at: new Date().toISOString(), fulfilled: !!w.fulfilled};
+      d.wishes.unshift(n); save(d); return n;
+    },
+    async deleteWish(id) { const d = load(); d.wishes = d.wishes.filter(x => x.id !== id); save(d); },
+    async myLists() { return load().lists; },
+    async saveList(l) {
+      const d = load();
+      if (l.id) { const i = d.lists.findIndex(x => x.id === l.id); if (i >= 0) { d.lists[i] = {...d.lists[i], ...l}; save(d); return d.lists[i]; } }
+      const n = {id: uid(), name: l.name, is_private: !!l.is_private, owner_id: 'local', created_at: new Date().toISOString()}; d.lists.push(n); save(d); return n;
+    },
+    async deleteList(id) { const d = load(); d.lists = d.lists.filter(x => x.id !== id); d.wishes.forEach(w => { if (w.list_id === id) w.list_id = null; }); save(d); },
+    async addDemo() {
+      const d = load(); const now = Date.now();
+      DEMO.forEach(([title, brand, shop, price, c], i) => d.wishes.push({id: uid(), owner_id: 'local', demo: true, title, brand, shop, price, currency: 'EUR', note: i === 1 ? 'Pointure 43' : '', url: '', image_url: demoImg(c), images: [], list_id: null, fulfilled: false, created_at: new Date(now - i * 3600e3).toISOString()}));
+      save(d);
+    },
+    async clearDemo() { const d = load(); d.wishes = d.wishes.filter(w => !w.demo); save(d); },
+    _raw: load, _clear() { lsSet(KEY, null); },
+  };
+}
+
+/* =====================================================================
+   STOCKAGE 2 : compte Supabase — iPhone + PC + amis
+   ===================================================================== */
+async function loadSupabaseLib() {
+  if (window.supabase && window.supabase.createClient) return;
+  await new Promise((ok, ko) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
+    s.onload = ok; s.onerror = () => ko(new Error('Impossible de charger Supabase (pas de connexion ?)'));
+    document.head.appendChild(s);
+  });
+}
+async function makeSupaStore() {
+  await loadSupabaseLib();
+  const sb = window.supabase.createClient(cleanSbUrl(cfg('SUPABASE_URL')), cfg('SUPABASE_ANON_KEY'), {auth: {persistSession: true, autoRefreshToken: true, detectSessionInUrl: true}});
+  let me = null;
+  const ck = r => { if (r.error) throw new Error(r.error.message); return r.data; };
+  const PROF = 'id,handle,name,avatar_url';
+  const store = {
+    kind: 'cloud', social: true, sb,
+    async init() {
+      const {data} = await sb.auth.getSession();
+      const u = data.session && data.session.user;
+      me = null;
+      if (u) { const r = await sb.from('profiles').select('*').eq('id', u.id).maybeSingle(); if (r.error) throw new Error(r.error.message); me = r.data ? {...r.data, email: u.email} : null; }
+      return {me};
+    },
+    async signIn(email, password) { ck(await sb.auth.signInWithPassword({email, password})); },
+    async signUp(email, password, handle, name) {
+      const a = await sb.rpc('handle_available', {h: handle}); if (a.error) throw new Error(a.error.message);
+      if (!a.data) throw new Error('Ce pseudo est déjà pris.');
+      const d = ck(await sb.auth.signUp({email, password, options: {data: {handle, name}, emailRedirectTo: location.origin + location.pathname}}));
+      return !!d.session;
+    },
+    async signOut() { try { await sb.auth.signOut(); } catch {} me = null; },
+    async myWishes() { return ck(await sb.from('wishes').select('*').eq('owner_id', me.id).order('created_at', {ascending: false})); },
+    async saveWish(w) {
+      const row = {title: w.title, brand: w.brand || '', shop: w.shop || '', price: w.price ?? null, currency: w.currency || 'EUR', note: w.note || '',
+                   url: safeHref(w.url), image_url: safeImg(w.image_url), images: (w.images || []).filter(u => !String(u).startsWith('data:')).slice(0, 12), list_id: w.list_id || null};
+      if (w.fulfilled !== undefined) row.fulfilled = !!w.fulfilled;
+      if (w.id) return ck(await sb.from('wishes').update(row).eq('id', w.id).select().single());
+      return ck(await sb.from('wishes').insert(row).select().single());
+    },
+    async deleteWish(id) { ck(await sb.from('wishes').delete().eq('id', id)); },
+    async myLists() { return ck(await sb.from('lists').select('*').eq('owner_id', me.id).order('created_at')); },
+    async saveList(l) {
+      if (l.id) return ck(await sb.from('lists').update({name: l.name, is_private: !!l.is_private}).eq('id', l.id).select().single());
+      return ck(await sb.from('lists').insert({name: l.name, is_private: !!l.is_private}).select().single());
+    },
+    async deleteList(id) { ck(await sb.from('lists').delete().eq('id', id)); },
+    async following() { return ck(await sb.from('follows').select(`followee:profiles!follows_followee_id_fkey(${PROF})`).eq('follower_id', me.id)).map(r => r.followee).filter(Boolean); },
+    async followers() { return ck(await sb.from('follows').select(`follower:profiles!follows_follower_id_fkey(${PROF})`).eq('followee_id', me.id)).map(r => r.follower).filter(Boolean); },
+    async follow(id) { ck(await sb.from('follows').insert({followee_id: id})); },
+    async unfollow(id) { ck(await sb.from('follows').delete().eq('follower_id', me.id).eq('followee_id', id)); },
+    async searchUsers(q) {
+      q = q.replace(/^@/, '').toLowerCase().replace(/[^a-z0-9_.]/g, '');
+      if (!q) return [];
+      return ck(await sb.from('profiles').select(PROF).ilike('handle', q.replace(/_/g, '\\_') + '%').neq('id', me.id).limit(15));
+    },
+    async profileByHandle(h) { return ck(await sb.from('profiles').select(PROF).eq('handle', h.toLowerCase()).maybeSingle()); },
+    async countFollowers(id) { const r = await sb.from('follows').select('follower_id', {count: 'exact', head: true}).eq('followee_id', id); return r.count || 0; },
+    async followsMe(id) { const r = await sb.from('follows').select('follower_id', {count: 'exact', head: true}).eq('follower_id', id).eq('followee_id', me.id); return (r.count || 0) > 0; },
+    async wishesOf(ownerId) { return ck(await sb.from('wishes').select('*').eq('owner_id', ownerId).order('created_at', {ascending: false})); },
+    async feed() {
+      const f = await store.following();
+      if (!f.length) return [];
+      return ck(await sb.from('wishes').select(`*, owner:profiles!wishes_owner_id_fkey(${PROF})`)
+        .in('owner_id', f.map(x => x.id)).eq('fulfilled', false).order('created_at', {ascending: false}).limit(100));
+    },
+    async reservationsFor(ids) { if (!ids.length) return []; return ck(await sb.from('reservations').select('wish_id,user_id').in('wish_id', ids)); },
+    async reserve(wishId) { ck(await sb.from('reservations').insert({wish_id: wishId})); },
+    async unreserve(wishId) { ck(await sb.from('reservations').delete().eq('wish_id', wishId).eq('user_id', me.id)); },
+    async updateProfile(p) { return ck(await sb.from('profiles').update(p).eq('id', me.id).select().single()); },
+  };
+  return store;
+}
+
+/* =====================================================================
+   ÉTAT + NAVIGATION
+   ===================================================================== */
+const UIS = {original: {name: 'Original', tc: '#0b0b0c'}};
+const S = {
+  ui: 'original', showSearch: false,
+  view: 'envies', me: null, wishes: [], lists: [], list: 'all', sort: 'recent', shop: '', showDone: false, q: '',
+  feed: [], following: [], followers: [], resv: {}, found: null, fq: '',
+  user: null, userWishes: [], userFollowers: 0, userFollowing: false, userFollowsMe: false,
+  busy: false, localCount: 0, sel: null, pendingAdd: '', lastLoad: 0, _wide: false,
+};
+let store = makeLocalStore();
+const cloud = () => store.kind === 'cloud';
+const signedIn = () => cloud() && !!S.me;
+const isWide = () => innerWidth >= 900;
+const isMine = w => store.kind === 'local' || (S.me && w.owner_id === S.me.id);
+const shopOf = w => w.brand || w.shop || host(w.url) || '';
+const priceTxt = w => w.price != null && w.price !== '' ? money(w.price, w.currency) : '';
+const findWish = id => [...S.wishes, ...S.feed, ...S.userWishes].find(w => w.id === id);
+const listName = id => { const l = S.lists.find(x => x.id === id); return l ? l.name : ''; };
+const wishPayload = (w, extra = {}) => ({id: w.id, title: w.title, brand: w.brand, shop: w.shop, price: w.price, currency: w.currency, note: w.note, url: w.url, image_url: w.image_url, images: w.images || [], list_id: w.list_id || null, ...extra});
+
+async function boot() {
+  let note = '';
+  const sp = new URLSearchParams(location.search);
+  const addU = extractUrl(sp.get('add') || sp.get('url') || sp.get('text') || '');
+  if (['add', 'url', 'text', 'title'].some(k => sp.has(k))) { ['add', 'url', 'text', 'title'].forEach(k => sp.delete(k)); history.replaceState(null, '', location.pathname + (sp.toString() ? '?' + sp : '') + location.hash); }
+  const kp = keyProblem(cfg('SUPABASE_ANON_KEY'));
+  if (cfg('SUPABASE_URL') && cfg('SUPABASE_ANON_KEY') && !kp) {
+    try { store = await makeSupaStore(); }
+    catch (e) { console.warn(e); store = makeLocalStore(); note = friendlyErr(e); }
+  } else if (kp) note = kp;
+  try { const r = await store.init(); S.me = r.me; }
+  catch (e) { note = friendlyErr(e); S.me = null; }
+  const m = location.hash.match(/^#\/u\/([a-z0-9_.]+)/i);
+  if (m && cloud()) await openUser(m[1]); else await go('envies');
+  if (note) toast(note, 6000);
+  if (addU) { if (cloud() && !S.me) { S.pendingAdd = addU; openAuth('login', 'Connecte-toi pour ajouter ce produit'); } else openAdd(addU); }
+}
+async function go(view, quiet) {
+  if (view !== S.view) { S.sel = null; S.q = ''; }
+  S.view = view; S.user = null;
+  if (!quiet) { S.busy = true; render(); }
+  try {
+    if (view === 'envies') {
+      if (!S.me) { S.wishes = []; S.lists = []; }
+      else { [S.wishes, S.lists] = await Promise.all([store.myWishes(), store.myLists()]); }
+      S.localCount = cloud() ? makeLocalStore()._raw().wishes.filter(w => !w.demo).length : 0;
+      if (S.list !== 'all' && !S.lists.some(l => l.id === S.list)) S.list = 'all';
+      if (S.sel && !S.wishes.some(w => w.id === S.sel)) S.sel = null;
+      S.resv = {};
+    } else if (view === 'feed' && signedIn()) {
+      S.feed = await store.feed();
+      const rs = await store.reservationsFor(S.feed.map(w => w.id));
+      S.resv = {}; rs.forEach(r => (S.resv[r.wish_id] = S.resv[r.wish_id] || []).push(r.user_id));
+    } else if (view === 'amis' && signedIn()) {
+      [S.following, S.followers] = await Promise.all([store.following(), store.followers()]);
+    }
+    S.lastLoad = Date.now();
+  } catch (e) { toast(friendlyErr(e), 6000); }
+  S.busy = false; render();
+}
+async function openUser(handle) {
+  if (!signedIn()) { await go('envies'); return openAuth('login', 'Connecte-toi pour voir la liste de @' + handle); }
+  try {
+    const p = await store.profileByHandle(handle);
+    if (!p) { toast('Personne ne s’appelle @' + handle); return go('amis'); }
+    if (p.id === S.me.id) { history.replaceState(null, '', location.pathname + location.search); return go('envies'); }
+    S.view = 'user'; S.user = p; S.sel = null; S.q = ''; S.userWishes = []; S.busy = true; render();
+    const [w, n, fl, fm] = await Promise.all([store.wishesOf(p.id), store.countFollowers(p.id), store.following(), store.followsMe(p.id)]);
+    S.userWishes = w.filter(x => !x.fulfilled); S.userFollowers = n; S.following = fl; S.userFollowing = fl.some(x => x.id === p.id); S.userFollowsMe = fm;
+    const rs = await store.reservationsFor(w.map(x => x.id)); S.resv = {}; rs.forEach(r => (S.resv[r.wish_id] = S.resv[r.wish_id] || []).push(r.user_id));
+  } catch (e) { toast(friendlyErr(e), 6000); }
+  S.busy = false; render();
+}
+
+/* =====================================================================
+   AFFICHAGE
+   ===================================================================== */
+function render() {
+  S._wide = false; S.sel = null;
+  $('#root').innerHTML = `<main class="main">${viewHTML()}</main>${bottomNav()}`;
+  renderItems();
+}
+function viewHTML() {
+  if (S.view === 'feed') return viewFeed();
+  if (S.view === 'amis') return viewAmis();
+  if (S.view === 'user') return viewUser();
+  return viewEnvies();
+}
+function bottomNav() {
+  const v = S.view === 'user' ? 'amis' : S.view;
+  return `<nav class="tabbar">${[['feed', 'Feed'], ['amis', 'Amis'], ['envies', 'Envies']].map(([k, t]) => `<button class="${v === k ? 'on' : ''}" data-act="tab" data-v="${k}">${t}</button>`).join('')}</nav>`;
+}
+function avatarHTML(p, size) {
+  const ini = ((p && (p.name || p.handle)) || '?').trim().charAt(0) || '?', src = p && safeImg(p.avatar_url);
+  const st = size ? ` style="width:${size}px;height:${size}px;font-size:${Math.round(size * .5)}px"` : '';
+  return `<div class="av"${st}>${src ? `<img src="${esc(src)}" alt="">` : esc(ini)}</div>`;
+}
+function imgTag(w) {
+  const s = safeImg(w.image_url), l = esc(((w.title || '?').trim().charAt(0) || '?').toUpperCase());
+  return s ? `<img src="${esc(s)}" alt="" loading="lazy" referrerpolicy="no-referrer" data-l="${l}">` : `<div class="ph">${l}</div>`;
+}
+function headerMe() {
+  const me = S.me || {handle: 'moi', name: 'Mes envies'};
+  const who = signedIn() ? '@' + esc(me.handle) + ' · ' : cloud() ? 'Pas connecté' : 'Sur cet appareil · ';
+  return `<div class="hd">${avatarHTML(me)}<div class="who"><div class="nm">${esc(me.name || me.handle)}</div><div class="sub">${who}${!cloud() || S.me ? '<span id="count"></span>' : ''}</div></div>
+    ${signedIn() ? `<button class="ib" data-act="shareMe" aria-label="Partager mon profil" title="Partager mon profil">${I.share}</button>` : ''}
+    <button class="ib" data-act="openMenu" aria-label="Menu" title="Menu">${I.menu}</button></div>`;
+}
+function bannersHTML() {
+  let h = '';
+  if (signedIn() && S.localCount) h += `<div class="note"><b>${S.localCount} envie${S.localCount > 1 ? 's' : ''}</b> enregistrée${S.localCount > 1 ? 's' : ''} sur cet appareil avant ta connexion. <button class="link" data-act="migrate">Les envoyer vers mon compte</button></div>`;
+  if (!cloud()) h += `<div class="note">Mode <b>sans compte</b> : tes envies restent sur cet appareil. Le compte (iPhone + PC + amis) se branche à l’étape suivante.</div>`;
+  if (!cloud() && S.wishes.some(w => w.demo)) h += `<div class="note">Ce sont des <b>exemples</b>. <button class="link" data-act="clearDemo">Les retirer</button></div>`;
+  return h;
+}
+function connectCard(msg) {
+  return `<div class="empty"><h3>Il faut un compte</h3><p>${msg}</p><div class="btns"><button class="btn" data-act="openAuth" data-mode="signup">Créer mon compte</button><button class="btn ghost" data-act="openAuth" data-mode="login">J’ai déjà un compte</button></div></div>`;
+}
+const searchBox = (ph = 'Rechercher une envie, une marque…') => `<label class="search">${I.search}<input id="q" type="search" enterkeyhint="search" placeholder="${esc(ph)}" value="${esc(S.q)}" autocomplete="off" autocorrect="off" spellcheck="false"></label>`;
+const sortSel = () => `<select class="sel" data-change="sort" aria-label="Trier">${[['recent', 'Trier'], ['asc', 'Prix ↑'], ['desc', 'Prix ↓'], ['az', 'A → Z']].map(([v, t]) => `<option value="${v}" ${S.sort === v ? 'selected' : ''}>${t}</option>`).join('')}</select>`;
+const shopSel = () => { const shops = [...new Set(S.wishes.map(shopOf).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'fr')); return shops.length > 1 ? `<select class="sel" data-change="shop" aria-label="Filtrer par boutique"><option value="">Filtrer</option>${shops.map(s => `<option ${S.shop === s ? 'selected' : ''}>${esc(s)}</option>`).join('')}</select>` : ''; };
+const doneChip = () => S.wishes.some(w => w.fulfilled) ? `<button class="chip ${S.showDone ? 'on' : ''}" data-act="toggleDone">Exaucées</button>` : '';
+function listChips() {
+  const cnt = id => S.wishes.filter(w => !w.fulfilled && (id === 'all' || w.list_id === id)).length;
+  return `<div class="chips"><button class="chip ${S.list === 'all' ? 'on' : ''}" data-act="setList" data-id="all">Tout</button>${S.lists.map(l => `<button class="chip ${S.list === l.id ? 'on' : ''}" data-act="setList" data-id="${esc(l.id)}">${esc(l.name)}${l.is_private ? ' 🔒' : ''}<span class="n">${cnt(l.id)}</span></button>`).join('')}<button class="chip" data-act="newList" aria-label="Nouvelle liste" style="font-size:18px;line-height:1">+</button></div>`;
+}
+const currentListName = () => S.list === 'all' ? 'Mes envies' : (listName(S.list) || 'Mes envies');
+
+function viewEnvies() {
+  if (cloud() && !S.me) return headerMe() + connectCard('Avec un compte, tes envies sont les mêmes sur ton iPhone et ton PC, et tu peux les partager avec tes amis.');
+  return `${headerMe()}${bannersHTML()}${listChips()}
+    <div class="bar">${sortSel()}${shopSel()}${doneChip()}<span class="sp"></span><button class="ib" data-act="toggleSearch" aria-label="Rechercher" title="Rechercher ( / )">${I.search}</button><button class="plus" data-act="openAdd" aria-label="Ajouter une envie" title="Ajouter ( N )">${I.plus}</button></div>
+    ${S.showSearch || S.q ? searchBox() : ''}<div id="items"></div>`;
+}
+function viewFeed() {
+  const h = `<div class="h1">Feed</div><p class="lead">Les dernières envies de tes amis.</p>`;
+  if (!cloud()) return h + connectCard('Le feed montre les envies de tes amis : il faut d’abord brancher le compte (étape suivante).');
+  if (!S.me) return h + connectCard('Connecte-toi pour voir les envies de tes amis.');
+  return h + `${S.feed.length > 8 ? searchBox('Chercher dans le feed') : ''}<div id="items"></div>`;
+}
+function personRow(p, extra = '', sub = '') {
+  return `<div class="person" data-act="openUser" data-handle="${esc(p.handle)}" style="cursor:pointer">${avatarHTML(p)}<div class="t"><b>${esc(p.name || p.handle)}</b><span>@${esc(p.handle)}${sub ? ' · ' + esc(sub) : ''}</span></div>${extra}</div>`;
+}
+function viewAmis() {
+  let h = `<div class="hd"><div class="who"><div class="h1" style="margin:0">Amis</div></div><button class="ib" data-act="openMenu" aria-label="Menu">${I.menu}</button></div>`;
+  if (!cloud() || !S.me) return h + connectCard('Pour ajouter des amis, il faut un compte (même pseudo sur iPhone et PC).');
+  const fIds = new Set(S.following.map(p => p.id)), frIds = new Set(S.followers.map(p => p.id));
+  h += `<div class="paste"><label class="search" style="flex:1;margin:0">${I.search}<input id="fq" placeholder="Chercher un pseudo" value="${esc(S.fq)}" autocapitalize="none" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="search"></label><button class="btn ghost" data-act="search">Chercher</button></div>`;
+  if (S.found) h += `<div class="sec">Résultats</div>` + (S.found.length ? S.found.map(p => personRow(p, fIds.has(p.id) ? `<button class="btn sm ghost" data-act="unfollow" data-id="${esc(p.id)}">Abonné ✓</button>` : `<button class="btn sm" data-act="follow" data-id="${esc(p.id)}">${frIds.has(p.id) ? 'Suivre en retour' : 'Suivre'}</button>`)).join('') : `<p class="mut">Aucun pseudo ne commence par « ${esc(S.fq)} ».</p>`);
+  const only = S.followers.filter(f => !fIds.has(f.id));
+  if (only.length) h += `<div class="sec">Demandes · te suivent</div><p class="mini" style="margin:-4px 2px 6px">Suis-les en retour pour leur montrer tes envies.</p>` + only.map(p => personRow(p, `<button class="btn sm" data-act="follow" data-id="${esc(p.id)}">Accepter</button>`)).join('');
+  h += `<div class="sec">Tu suis</div>`;
+  if (!S.following.length) h += `<div class="empty" style="padding:24px 10px"><h3>Pas encore d’amis.</h3><p>Tu vois les envies des gens qui te suivent ; ils voient les tiennes quand tu les suis. Partage ton pseudo ou cherche quelqu’un.</p><button class="btn ghost" data-act="shareMe">Partager @${esc(S.me.handle)}</button></div>`;
+  else h += S.following.map(p => personRow(p, '', frIds.has(p.id) ? 'ami' : 'en attente de retour')).join('');
+  return h;
+}
+function viewUser() {
+  const p = S.user; if (!p) return '';
+  return `<div class="hd"><button class="ib" data-act="tab" data-v="amis" aria-label="Retour">${I.back}</button>${avatarHTML(p)}<div class="who"><div class="nm">${esc(p.name || p.handle)}</div><div class="sub">@${esc(p.handle)} · ${S.userFollowers} abonné${S.userFollowers > 1 ? 's' : ''}</div></div>
+    ${S.userFollowing ? `<button class="btn sm ghost" data-act="unfollow" data-id="${esc(p.id)}" data-stay="1">Abonné ✓</button>` : `<button class="btn sm" data-act="follow" data-id="${esc(p.id)}" data-stay="1">Suivre</button>`}</div>
+    ${!S.busy && !S.userFollowsMe ? `<div class="note">Tu verras les envies de @${esc(p.handle)} quand il ou elle te suivra.</div>` : ''}<div id="items"></div>`;
+}
+
+/* ---------- cartes ---------- */
+function opts(w) { const mine = isMine(w); return {owner: w.owner || null, reserved: !mine && (S.resv[w.id] || []).length > 0, mine}; }
+function card(w) {
+  const o = opts(w), p = priceTxt(w), s = safeImg(w.image_url), l = esc(((w.title || '?').trim().charAt(0) || '?').toUpperCase());
+  const im = s ? `<div class="im"><img src="${esc(s)}" alt="" loading="lazy" referrerpolicy="no-referrer" data-l="${l}"></div>` : `<div class="im ph">${l}</div>`;
+  return `<article class="card ${w.fulfilled ? 'is-done' : ''}" data-act="openWish" data-id="${esc(w.id)}" tabindex="0">${w.fulfilled ? '<span class="badge done">exaucée</span>' : ''}${o.reserved ? '<span class="badge">Réservé</span>' : ''}${im}
+    <div class="meta">${o.owner ? `<div class="by"><b>@${esc(o.owner.handle)}</b></div>` : ''}<div class="shop">${esc(shopOf(w))}</div><div class="ttl">${esc(w.title)}</div>${p ? `<div class="pr num">${esc(p)}</div>` : '<div class="pr na">Prix à vérifier</div>'}</div></article>`;
+}
+function sortWishes(a) {
+  const b = [...a], p = x => (x.price == null || x.price === '' ? null : Number(x.price));
+  if (S.sort === 'asc') b.sort((x, y) => (p(x) ?? Infinity) - (p(y) ?? Infinity));
+  else if (S.sort === 'desc') b.sort((x, y) => (p(y) ?? -1) - (p(x) ?? -1));
+  else if (S.sort === 'az') b.sort((x, y) => (x.title || '').localeCompare(y.title || '', 'fr'));
+  else b.sort((x, y) => String(y.created_at || '').localeCompare(String(x.created_at || '')));
+  return b;
+}
+function itemsFor() {
+  const q = norm(S.q.trim());
+  const match = w => !q || norm([w.title, w.brand, w.shop, w.note, w.owner && w.owner.handle, listName(w.list_id)].join(' ')).includes(q);
+  if (S.view === 'feed') return S.feed.filter(match);
+  if (S.view === 'user') return sortWishes(S.userWishes.filter(match));
+  return sortWishes(S.wishes.filter(w => (S.list === 'all' || w.list_id === S.list) && (!S.shop || shopOf(w) === S.shop) && (S.showDone || !w.fulfilled) && match(w)));
+}
+function sumBy(arr) {
+  const t = {};
+  arr.forEach(w => { if (!w.fulfilled && w.price != null && w.price !== '' && !isNaN(w.price)) { const c = w.currency || 'EUR'; t[c] = (t[c] || 0) + Number(w.price); } });
+  return Object.entries(t).map(([c, v]) => money(Math.round(v * 100) / 100, c)).join(' + ');
+}
+const countTxt = arr => { const n = arr.filter(w => !w.fulfilled).length; return `${n} envie${n > 1 ? 's' : ''}`; };
+function emptyFor() {
+  if (S.q.trim()) return `<div class="empty"><h3>Aucun résultat.</h3><p>Rien ne correspond à « ${esc(S.q)} ».</p><button class="btn ghost" data-act="clearQ">Effacer la recherche</button></div>`;
+  if (S.busy) return '<div class="reading"><span class="spin"></span></div>';
+  if (S.view === 'feed') return `<div class="empty"><h3>Aucune envie à voir.</h3><p>Les envies de tes amis apparaissent ici quand ils te suivent.</p><button class="btn" data-act="tab" data-v="amis">Trouver quelqu’un</button></div>`;
+  if (S.view === 'user') return S.userFollowsMe ? `<div class="empty"><h3>Rien pour l’instant.</h3><p>Pas encore d’envie visible.</p></div>` : '';
+  if (S.wishes.length) return `<div class="empty"><h3>Rien ici.</h3><p>${S.list !== 'all' ? 'Cette liste est vide.' : 'Toutes tes envies sont exaucées ou filtrées.'}</p></div>`;
+  const pc = matchMedia('(hover:hover)').matches;
+  return `<div class="empty"><h3>Rien ici pour l’instant.</h3><p>Colle le lien d’un produit : l’image, le nom et souvent le prix se remplissent tout seuls.${pc ? '<br>Astuce PC : copie un lien puis fais <b>Ctrl+V</b> n’importe où ici.' : ''}</p>
+    <div class="btns"><button class="btn" data-act="openAdd">Ajouter une envie</button>${!cloud() ? '<button class="btn ghost" data-act="demo">Voir avec des exemples</button>' : ''}</div></div>`;
+}
+function renderItems() {
+  const el = $('#items'); if (!el) return;
+  const arr = itemsFor();
+  const c = $('#count'); if (c) { const sum = sumBy(arr); c.textContent = countTxt(arr) + (sum ? ' · ' + sum : ''); }
+  if (!arr.length) { el.innerHTML = emptyFor(); return; }
+  const n = gridCols(), cols = Array.from({length: n}, () => []);
+  arr.forEach((w, i) => cols[i % n].push(card(w)));   // gauche → droite : les plus récentes en haut
+  el.innerHTML = `<div class="grid">${cols.map(c => `<div class="col">${c.join('')}</div>`).join('')}</div>`;
+}
+const gridCols = () => innerWidth >= 1180 ? 5 : innerWidth >= 900 ? 4 : innerWidth >= 620 ? 3 : 2;
+
+/* =====================================================================
+   FEUILLES (fenêtres) et panneau latéral
+   ===================================================================== */
+let sheetEl = null;
+function openSheet(html) {
+  closeSheet(true);
+  sheetEl = document.createElement('div'); sheetEl.className = 'sb';
+  sheetEl.innerHTML = `<div class="sheet" role="dialog" aria-modal="true"><div class="grab"></div>${html}</div>`;
+  sheetEl.addEventListener('pointerdown', e => { sheetEl._down = e.target === sheetEl; });
+  sheetEl.addEventListener('click', e => { if (e.target === sheetEl && sheetEl._down) closeSheet(); });
+  document.body.appendChild(sheetEl); document.body.classList.add('noscroll');
+  requestAnimationFrame(() => sheetEl && sheetEl.classList.add('on'));
+  return sheetEl.querySelector('.sheet');
+}
+function closeSheet(instant) {
+  if (!sheetEl) return;
+  const el = sheetEl; sheetEl = null; document.body.classList.remove('noscroll');
+  if (instant) el.remove(); else { el.style.pointerEvents = 'none'; el.classList.remove('on'); setTimeout(() => el.remove(), 220); }
+}
+function renderSide() {
+  const el = $('#side'), w = findWish(S.sel); if (!el) return;
+  if (!w) { S.sel = null; render(); return; }
+  el.innerHTML = `<div class="side-x"><button class="ib" data-act="closeSide" aria-label="Fermer">${I.x}</button></div>${detailHTML(w)}`;
+}
+
+/* ---- fiche d'une envie ---- */
+function detailHTML(w) {
+  const mine = isMine(w), href = safeHref(w.url), owner = w.owner || (S.user && S.user.id === w.owner_id ? S.user : null);
+  const rs = S.resv[w.id] || [], mineRes = S.me && rs.includes(S.me.id), p = priceTxt(w);
+  let acts;
+  if (mine) {
+    acts = `${href ? `<a class="btn block" href="${esc(href)}" target="_blank" rel="noopener noreferrer">${I.ext}Voir / acheter</a>` : ''}
+      <div class="links"><button class="link" data-act="editWish" data-id="${esc(w.id)}">Modifier</button>
+      <button class="link" data-act="pickList" data-id="${esc(w.id)}">Liste : ${esc(listName(w.list_id) || 'aucune')}</button>
+      <button class="link" data-act="shareWish" data-id="${esc(w.id)}">Partager</button>
+      <button class="link" data-act="doneWish" data-id="${esc(w.id)}">${w.fulfilled ? 'Remettre dans mes envies' : 'Marquer comme exaucée'}</button>
+      <button class="link bad" data-act="delWish" data-id="${esc(w.id)}">Supprimer</button></div>`;
+  } else {
+    acts = `${href ? `<a class="btn block" href="${esc(href)}" target="_blank" rel="noopener noreferrer">${I.ext}Voir / acheter</a>` : ''}<div style="height:10px"></div>
+      <button class="btn ghost block" data-act="reserve" data-id="${esc(w.id)}" data-on="${mineRes ? 0 : 1}">${mineRes ? '✓ Réservé par moi — annuler' : rs.length ? 'Déjà réservé par un ami · je participe' : 'Je l’offre (en secret)'}</button>
+      <p class="mini" style="margin:10px 2px 0">${esc(owner ? '@' + owner.handle : 'La personne')} ne voit pas les réservations ; ses autres amis oui, pour éviter les doublons.</p>
+      <div class="links"><button class="link" data-act="shareWish" data-id="${esc(w.id)}">Partager</button></div>`;
+  }
+  return `<div class="pimg">${imgTag(w)}</div><div class="dshop">${owner ? '@' + esc(owner.handle) + ' · ' : ''}${esc(shopOf(w))}</div><h3 class="dtitle">${esc(w.title)}</h3>
+    <div class="dprice num">${p ? esc(p) : '<span class="mut" style="font-size:14px;font-weight:500">Prix à vérifier</span>'}<small>${esc(host(w.url))}${w.created_at ? ' · ' + esc(fdate(w.created_at)) : ''}</small></div>
+    ${w.note ? `<p class="dnote">${esc(w.note)}</p>` : ''}${acts}`;
+}
+function openWish(id) {
+  const w = findWish(id); if (!w) return;
+  if (S._wide) { S.sel = id; closeSheet(true); render(); return; }
+  openSheet(detailHTML(w));
+}
+function pickList(id) {
+  const w = findWish(id); if (!w) return;
+  const rows = [{id: '', name: 'Aucune liste'}, ...S.lists].map(l => `<button class="pick ${(w.list_id || '') === l.id ? 'on' : ''}" data-act="setWishList" data-id="${esc(id)}" data-list="${esc(l.id)}"><span class="dot"></span>${esc(l.name)}</button>`).join('');
+  openSheet(`<h2>Ranger dans…</h2><p class="hint">Une envie appartient à une seule liste.</p>${rows}<button class="pick" data-act="newListFor" data-id="${esc(id)}"><span style="width:18px;text-align:center">＋</span>Nouvelle liste…</button>`);
+}
+function askText(title, ph, val) {
+  return new Promise(res => {
+    const sh = openSheet(`<h2>${esc(title)}</h2><p class="hint">&nbsp;</p><input id="t_in" class="fld" placeholder="${esc(ph)}" value="${esc(val || '')}" maxlength="40"><div class="actions"><button class="btn ghost" id="t_no">Annuler</button><button class="btn" id="t_ok">OK</button></div>`);
+    const i = $('#t_in', sh); setTimeout(() => i.focus(), 250);
+    let done = false; const fin = v => { if (done) return; done = true; closeSheet(); res(v); };
+    $('#t_ok', sh).onclick = () => fin(i.value.trim()); $('#t_no', sh).onclick = () => fin('');
+    i.addEventListener('keydown', e => { if (e.key === 'Enter') fin(i.value.trim()); });
+  });
+}
+
+/* ---- ajout / modification ---- */
+let FORM = null;
+function formHTML() {
+  const w = FORM.w, imgs = FORM.images;
+  const th = imgs.length > 1 ? `<div class="lbl">Choisir une autre image</div><div class="thumbs">${imgs.map((u, i) => `<img src="${esc(safeImg(u))}" referrerpolicy="no-referrer" data-act="pickImg" data-i="${i}" class="${u === w.image_url ? 'on' : ''}" alt="">`).join('')}</div>` : '';
+  const lists = `<select id="f_list" class="fld"><option value="">Aucune liste</option>${S.lists.map(l => `<option value="${esc(l.id)}" ${w.list_id === l.id ? 'selected' : ''}>${esc(l.name)}</option>`).join('')}<option value="__new">＋ Nouvelle liste…</option></select>`;
+  const cur = ['EUR', 'CHF', 'USD', 'GBP', 'CAD', 'JPY']; if (w.currency && !cur.includes(w.currency)) cur.push(w.currency);
+  return `<h2>${FORM.mode === 'edit' ? 'Modifier l’envie' : 'Ajouter une envie'}</h2><p class="hint">${FORM.mode === 'edit' ? 'Corrige ce qui a mal été récupéré' : 'Vérifie les infos puis ajoute'}</p>
+    <div class="pimg">${imgTag(w)}</div>${th}
+    <div style="display:flex;gap:8px;margin:0 0 4px"><label class="btn sm ghost">📷 Photo de l’appareil<input id="f_file" type="file" accept="image/*" hidden></label>${w.image_url ? '<button class="btn sm ghost" data-act="removeImg">Retirer l’image</button>' : ''}</div>
+    <div class="lbl">Nom du produit *</div><input id="f_title" class="fld" value="${esc(w.title)}" placeholder="Ex. Veste imperméable" maxlength="300">
+    <div class="frow"><div><div class="lbl">Marque</div><input id="f_brand" class="fld" value="${esc(w.brand)}" placeholder="Facultatif" maxlength="120"></div><div><div class="lbl">Boutique</div><input id="f_shop" class="fld" value="${esc(w.shop)}" placeholder="Ex. amazon.fr" maxlength="120"></div></div>
+    <div class="frow"><div><div class="lbl">Prix</div><input id="f_price" class="fld" inputmode="decimal" value="${w.price ?? ''}" placeholder="0,00"></div><div class="w1"><div class="lbl">Devise</div><select id="f_cur" class="fld">${cur.map(c => `<option ${w.currency === c ? 'selected' : ''}>${c}</option>`).join('')}</select></div></div>
+    <div class="lbl">Note personnelle</div><input id="f_note" class="fld" value="${esc(w.note)}" placeholder="Taille, couleur, commentaire…" maxlength="1000">
+    <div class="lbl">Lien du produit</div><input id="f_url" class="fld" value="${esc(w.url)}" placeholder="https://…" inputmode="url" autocapitalize="none" autocorrect="off">
+    <div class="lbl">Liste</div>${lists}
+    <div class="err" id="f_err"></div>
+    <div class="actions">${FORM.mode === 'edit' ? '<button class="btn ghost" data-act="closeSheet">Annuler</button><button class="btn" data-act="saveForm">Enregistrer</button>' : '<button class="btn block" data-act="saveForm">Ajouter à mes envies</button>'}</div>`;
+}
+function readForm() {
+  const g = id => ($('#' + id) || {}).value || '';
+  if (!$('#f_title')) return;
+  Object.assign(FORM.w, {title: g('f_title').trim(), brand: g('f_brand').trim(), shop: g('f_shop').trim(), price: parsePrice(g('f_price')), currency: g('f_cur') || 'EUR',
+    note: g('f_note').trim(), url: g('f_url').trim(), list_id: g('f_list') === '__new' ? FORM.w.list_id : (g('f_list') || null)});
+}
+function mountForm() {
+  const sh = openSheet(formHTML());
+  const f = $('#f_file', sh);
+  if (f) f.onchange = async () => {
+    if (!f.files[0]) return;
+    try { readForm(); const d = await resizeImage(f.files[0]); FORM.w.image_url = d; FORM.images = [d, ...FORM.images.filter(x => !String(x).startsWith('data:'))]; mountForm(); }
+    catch { toast('Image illisible (format non pris en charge ?)'); }
+  };
+  const l = $('#f_list', sh);
+  if (l) l.onchange = async () => { if (l.value === '__new') { readForm(); const n = await askText('Nouvelle liste', 'Nom de la liste', ''); if (n) { try { const x = await store.saveList({name: n}); S.lists.push(x); FORM.w.list_id = x.id; } catch (e) { toast(friendlyErr(e)); } } mountForm(); } };
+}
+function openAdd(prefill) {
+  if (cloud() && !S.me) { S.pendingAdd = typeof prefill === 'string' ? prefill : ''; return openAuth('signup', 'Crée ton compte pour enregistrer tes envies'); }
+  FORM = {mode: 'add', images: [], w: {title: '', brand: '', shop: '', price: null, currency: 'EUR', note: '', url: '', image_url: '', list_id: S.view === 'envies' && S.list !== 'all' ? S.list : null}};
+  const sh = openSheet(`<h2>Ajouter une envie</h2><p class="hint">Colle le lien de n’importe quel produit</p>
+    <div class="paste"><input id="a_url" class="fld" placeholder="https://…" inputmode="url" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="go"><button class="btn" id="a_paste" style="min-height:46px">Coller</button></div>
+    <div id="a_body"><p style="text-align:center;margin:22px 0 0"><button class="link dim" data-act="addManual">Ou ajouter sans lien</button></p></div>`);
+  const inp = $('#a_url', sh); let running = false;
+  const run = async () => {
+    const url = extractUrl(inp.value); if (!url) { if (inp.value.trim()) toast('Ce n’est pas un lien valide'); return; }
+    if (running) return; running = true;
+    inp.value = url; $('#a_body', sh).innerHTML = '<div class="reading"><span class="spin"></span>Lecture de la page…</div>';
+    const dup = S.wishes.find(w => w.url && w.url.split('#')[0] === url.split('#')[0]);
+    const meta = await fetchMeta(url);
+    if (!sheetEl || !$('#a_url')) return;
+    FORM.w.url = url; FORM.w.shop = host(url);
+    if (meta) {
+      Object.assign(FORM.w, {title: meta.title, brand: meta.brand, shop: meta.shop || host(url), price: meta.price, currency: meta.currency || 'EUR', image_url: meta.images[0] || ''});
+      FORM.images = meta.images;
+      if (meta.price == null) toast('Prix non trouvé : ajoute-le à la main', 3500);
+    } else toast('Page illisible : remplis les infos à la main', 3500);
+    mountForm();
+    if (dup) toast('Attention : ce produit est déjà dans tes envies', 4000);
+  };
+  inp.addEventListener('keydown', e => { if (e.key === 'Enter') run(); });
+  inp.addEventListener('paste', () => setTimeout(run, 30));
+  $('#a_paste', sh).onclick = async () => {
+    try { const t = await navigator.clipboard.readText(); if (t) { inp.value = t; run(); } else toast('Le presse-papiers est vide'); }
+    catch { inp.focus(); toast('Colle le lien dans la case (appui long → Coller)'); }
+  };
+  if (typeof prefill === 'string' && prefill) { inp.value = prefill; run(); }
+  else setTimeout(() => { if (matchMedia('(hover:hover)').matches && sheetEl) inp.focus(); }, 260);
+}
+function openEdit(w) { FORM = {mode: 'edit', images: [...new Set([w.image_url, ...(w.images || [])].filter(Boolean))], w: {...w}}; mountForm(); }
+async function saveForm() {
+  readForm(); const w = FORM.w, err = $('#f_err');
+  if (!w.title) { err.textContent = 'Donne un nom à cette envie.'; $('#f_title').focus(); return; }
+  if (w.url && !safeHref(w.url)) { const u = extractUrl(w.url); if (u) w.url = u; else { err.textContent = 'Le lien doit commencer par https://'; return; } }
+  const btn = $('[data-act=saveForm]'); if (btn) btn.disabled = true;
+  try {
+    await store.saveWish({...w, images: FORM.images.filter(u => !String(u).startsWith('data:')).slice(0, 12)});
+    const adding = FORM.mode === 'add'; closeSheet(); await go('envies'); toast(adding ? 'Ajouté ✓' : 'Enregistré ✓');
+  } catch (e) { if (btn) btn.disabled = false; err.textContent = friendlyErr(e); }
+}
+
+/* ---- connexion ---- */
+function openAuth(mode = 'login', hint = '') {
+  if (!cloud()) { toast('Le compte n’est pas encore branché (Menu → Réglages de connexion)', 4000); return; }
+  const signup = mode === 'signup';
+  const sh = openSheet(`<h2>${signup ? 'Créer mon compte' : 'Connexion'}</h2><p class="hint">${esc(hint || (signup ? 'Le même compte sur iPhone et PC' : 'Retrouve tes envies'))}</p>
+    ${signup ? `<div class="lbl">Pseudo (visible par tes amis)</div><input id="u_handle" class="fld" placeholder="ex. ilian" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="24"><div class="lbl">Prénom affiché</div><input id="u_name" class="fld" placeholder="Facultatif" maxlength="40">` : ''}
+    <div class="lbl">E-mail</div><input id="u_mail" class="fld" type="email" autocomplete="email" autocapitalize="none" autocorrect="off">
+    <div class="lbl">Mot de passe</div><input id="u_pw" class="fld" type="password" autocomplete="${signup ? 'new-password' : 'current-password'}" placeholder="8 caractères minimum">
+    <div class="err" id="u_err"></div>
+    <div class="actions"><button class="btn block" id="u_go">${signup ? 'Créer le compte' : 'Se connecter'}</button></div>
+    <p style="text-align:center;margin:16px 0 0"><button class="link dim" data-act="openAuth" data-mode="${signup ? 'login' : 'signup'}">${signup ? 'J’ai déjà un compte' : 'Créer un compte'}</button></p>`);
+  const err = t => { $('#u_err', sh).textContent = t; };
+  let busy = false;
+  const submit = async () => {
+    if (busy) return;
+    const email = $('#u_mail', sh).value.trim(), pw = $('#u_pw', sh).value;
+    if (!/^\S+@\S+\.\S+$/.test(email)) return err('Adresse e-mail invalide.');
+    if (pw.length < (signup ? 8 : 6)) return err(signup ? 'Mot de passe : 8 caractères minimum.' : 'Mot de passe trop court.');
+    const b = $('#u_go', sh); busy = true; b.disabled = true; err('');
+    try {
+      let wanted = '';
+      if (signup) {
+        wanted = $('#u_handle', sh).value.trim().replace(/^@/, '').toLowerCase();
+        if (!isHandle(wanted)) throw new Error('Pseudo : 3 à 24 caractères (lettres minuscules, chiffres, _ ou .).');
+        const started = await store.signUp(email, pw, wanted, $('#u_name', sh).value.trim());
+        if (!started) { busy = false; b.disabled = false; return err('Compte créé ! Ouvre le mail de confirmation, clique sur le lien, puis connecte-toi ici.'); }
+      } else await store.signIn(email, pw);
+      const r = await store.init(); S.me = r.me;
+      if (!S.me) throw new Error('Connecté, mais ton profil est introuvable : le fichier supabase-schema.sql a-t-il bien été exécuté ?');
+      closeSheet(); await go('envies');
+      toast(wanted && S.me.handle !== wanted ? 'Ce pseudo était pris : tu es @' + S.me.handle : 'Connecté ✓', 4000);
+      if (S.pendingAdd) { const u = S.pendingAdd; S.pendingAdd = ''; openAdd(u); }
+    } catch (e) { busy = false; b.disabled = false; err(friendlyErr(e)); }
+  };
+  $('#u_go', sh).onclick = submit;
+  sh.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
+}
+
+/* ---- menu ---- */
+function openMenu() {
+  const acc = signedIn()
+    ? `${personRowStatic(S.me)}<div class="links" style="margin-top:4px"><button class="link" data-act="editProfile">Changer mon prénom affiché</button><button class="link" data-act="signOut">Se déconnecter</button></div>`
+    : cloud() ? `<div class="links"><button class="link" data-act="openAuth" data-mode="login">Se connecter</button><button class="link" data-act="openAuth" data-mode="signup">Créer un compte</button></div>`
+    : `<p class="mini" style="margin:0">Pas de compte : tout reste sur cet appareil. Le compte (iPhone + PC + amis) se branche dans « Réglages de connexion ».</p>`;
+  const httpApp = /^https?:$/.test(location.protocol) && matchMedia('(hover:hover)').matches;
+  const appUrl = location.origin + location.pathname;
+  const bm = `javascript:(function(){window.open('${appUrl}?add='+encodeURIComponent(location.href),'_blank')})()`;
+  openSheet(`<h2>Menu</h2><p class="hint">${esc(CFG.APP_NAME)}</p>
+    <div class="sec" style="margin-top:4px">Compte</div>${acc}
+    <div class="sec">Listes</div><div class="links"><button class="link" data-act="manageLists">Gérer mes listes</button></div>
+    ${httpApp ? `<div class="sec">Ajouter depuis n’importe quel site (PC)</div><p class="mini" style="margin:0 2px 8px">Glisse ce bouton dans ta barre de favoris. Sur une page produit, clique dessus : l’envie s’ajoute.</p><a class="btn sm ghost bm" href="${esc(bm)}">＋ ${esc(CFG.APP_NAME)}</a>` : ''}
+    <div class="sec">Sauvegarde</div><div class="links"><button class="link" data-act="exportJson">Exporter mes envies (fichier)</button><label class="link" style="cursor:pointer">Importer un fichier<input id="imp" type="file" accept="application/json,.json" hidden></label>${!cloud() && S.wishes.some(w => w.demo) ? '<button class="link" data-act="clearDemo">Retirer les exemples</button>' : ''}</div>
+    <div class="sec">Avancé</div><div class="links"><button class="link" data-act="openCfg">Réglages de connexion</button></div>`);
+  const imp = $('#imp'); if (imp) imp.onchange = async () => { try { await importJson(await imp.files[0].text()); } catch (e) { toast('Fichier invalide : ' + friendlyErr(e), 4000); } };
+}
+const personRowStatic = p => `<div class="person">${avatarHTML(p)}<div class="t"><b>${esc(p.name || p.handle)}</b><span>@${esc(p.handle)}${p.email ? ' · ' + esc(p.email) : ''}</span></div></div>`;
+function openCfg() {
+  openSheet(`<h2>Réglages de connexion</h2><p class="hint">Saisis-les une fois par appareil (ou directement dans le fichier).</p>
+    <div class="lbl">Supabase — Project URL</div><input id="c_url" class="fld" value="${esc(cfg('SUPABASE_URL'))}" placeholder="https://xxxx.supabase.co" autocapitalize="none" autocorrect="off" spellcheck="false">
+    <div class="lbl">Supabase — clé « publishable » (ou « anon »)</div><input id="c_key" class="fld" value="${esc(cfg('SUPABASE_ANON_KEY'))}" placeholder="sb_publishable_… ou eyJ…" autocapitalize="none" autocorrect="off" spellcheck="false">
+    <div class="lbl">Relais de lecture des pages (facultatif)</div><input id="c_rel" class="fld" value="${esc(cfg('META_RELAY'))}" placeholder="https://xxx.workers.dev" autocapitalize="none" autocorrect="off" spellcheck="false">
+    <p class="mini" style="margin:10px 2px 0">⚠️ Ne mets jamais la clé « secret » ou « service_role » : l’appli la refuse.</p><div class="err" id="c_err"></div>
+    <div class="actions"><button class="btn ghost" data-act="closeSheet">Annuler</button><button class="btn" data-act="saveCfg">Enregistrer</button></div>`);
+}
+function manageLists() {
+  const rows = S.lists.length ? S.lists.map(l => `<div class="person" style="flex-wrap:wrap"><div class="t"><b>${esc(l.name)}</b><span>${l.is_private ? 'Privée : invisible pour tes amis' : 'Visible par tes amis'}</span></div>
+      <button class="btn sm ghost" data-act="renList" data-id="${esc(l.id)}">Renommer</button>
+      ${cloud() ? `<button class="btn sm ghost" data-act="privList" data-id="${esc(l.id)}">${l.is_private ? 'Rendre visible' : 'Rendre privée'}</button>` : ''}
+      <button class="btn sm ghost" data-act="delList" data-id="${esc(l.id)}" aria-label="Supprimer la liste">✕</button></div>`).join('') : '<p class="mut" style="text-align:center">Aucune liste pour l’instant.</p>';
+  openSheet(`<h2>Mes listes</h2><p class="hint">Supprimer une liste ne supprime pas ses envies.</p>${rows}<div class="actions"><button class="btn" data-act="newList">Nouvelle liste</button></div>`);
+}
+async function exportJson() {
+  const data = {app: CFG.APP_NAME, version: 1, exported_at: new Date().toISOString(), lists: S.lists, wishes: S.wishes.filter(w => !w.demo).map(w => { const x = {...w}; delete x.owner; return x; })};
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'}));
+  a.download = 'mes-envies-' + new Date().toISOString().slice(0, 10) + '.json'; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+async function importJson(txt) {
+  const d = JSON.parse(txt); if (!d || !Array.isArray(d.wishes)) throw new Error('format inconnu');
+  const map = {}; let n = 0;
+  for (const l of d.lists || []) { if (!l || !l.name) continue; const x = await store.saveList({name: String(l.name).slice(0, 40), is_private: !!l.is_private}); map[l.id] = x.id; }
+  for (const w of d.wishes) {
+    if (!w || !w.title) continue;
+    await store.saveWish({title: String(w.title).slice(0, 300), brand: w.brand || '', shop: w.shop || '', price: parsePrice(w.price), currency: /^[A-Z]{3}$/.test(w.currency) ? w.currency : 'EUR',
+      note: w.note || '', url: safeHref(w.url), image_url: safeImg(w.image_url), images: Array.isArray(w.images) ? w.images.map(safeImg).filter(Boolean) : [], list_id: w.list_id ? map[w.list_id] || null : null, fulfilled: !!w.fulfilled});
+    n++;
+  }
+  closeSheet(); await go('envies'); toast(n + ' envie' + (n > 1 ? 's' : '') + ' importée' + (n > 1 ? 's' : '') + ' ✓');
+}
+async function migrateLocal() {
+  const loc = makeLocalStore(), raw = loc._raw(), map = {}, wishes = raw.wishes.filter(w => !w.demo);
+  try {
+    for (const l of raw.lists) { const n = await store.saveList({name: l.name, is_private: l.is_private}); map[l.id] = n.id; }
+    for (const w of [...wishes].reverse()) await store.saveWish({...wishPayload(w), id: undefined, list_id: w.list_id ? map[w.list_id] || null : null, fulfilled: !!w.fulfilled});
+    loc._clear(); await go('envies'); toast(wishes.length + ' envie' + (wishes.length > 1 ? 's' : '') + ' envoyée' + (wishes.length > 1 ? 's' : '') + ' ✓');
+  } catch (e) { toast(friendlyErr(e), 6000); await go('envies'); }
+}
+
+/* =====================================================================
+   ACTIONS
+   ===================================================================== */
+const A = {
+  tab: d => { history.replaceState(null, '', location.pathname + location.search); closeSheet(true); return go(d.v); },
+  closeSheet: () => closeSheet(),
+  closeSide: () => { S.sel = null; render(); },
+  openAdd: () => openAdd(), openMenu, openCfg, manageLists, exportJson,
+  openAuth: d => openAuth(d.mode),
+  openWish: d => openWish(d.id),
+  editWish: d => { const w = findWish(d.id); if (w) openEdit(w); },
+  addManual: () => { FORM.w.url = ''; mountForm(); setTimeout(() => { const t = $('#f_title'); if (t) t.focus(); }, 250); },
+  pickImg: d => { readForm(); FORM.w.image_url = FORM.images[+d.i]; mountForm(); },
+  removeImg: () => { readForm(); FORM.w.image_url = ''; mountForm(); },
+  saveForm,
+  setList: d => { S.list = d.id; S.shop = ''; if (S.view !== 'envies') return go('envies'); S.sel = null; render(); },
+  toggleDone: () => { S.showDone = !S.showDone; render(); },
+  clearQ: () => { S.q = ''; render(); },
+  newList: async () => { const n = await askText('Nouvelle liste', 'Ex. Anniversaire, Setup, Mode…', ''); if (!n) return; const l = await store.saveList({name: n}); S.lists.push(l); S.list = l.id; if (S.view !== 'envies') await go('envies'); else render(); },
+  newListFor: async d => { const n = await askText('Nouvelle liste', 'Nom de la liste', ''); if (!n) return; const l = await store.saveList({name: n}); S.lists.push(l); await A.setWishList({id: d.id, list: l.id}); },
+  setWishList: async d => { const w = findWish(d.id); await store.saveWish(wishPayload(w, {list_id: d.list || null})); closeSheet(); await go('envies'); toast('Rangé ✓'); },
+  pickList: d => pickList(d.id),
+  renList: async d => { const l = S.lists.find(x => x.id === d.id); const n = await askText('Renommer la liste', 'Nom', l.name); if (n) { await store.saveList({id: l.id, name: n, is_private: l.is_private}); await go('envies'); } manageLists(); },
+  privList: async d => { const l = S.lists.find(x => x.id === d.id); await store.saveList({id: l.id, name: l.name, is_private: !l.is_private}); await go('envies'); manageLists(); },
+  delList: async d => { if (!confirm('Supprimer cette liste ? Ses envies restent dans « Tout ».')) return; await store.deleteList(d.id); await go('envies'); manageLists(); },
+  doneWish: async d => { const w = findWish(d.id); await store.saveWish(wishPayload(w, {fulfilled: !w.fulfilled})); closeSheet(); await go('envies'); toast(w.fulfilled ? 'Remise dans tes envies' : 'Envie exaucée 🎉'); },
+  quickDone: async d => {
+    const w = findWish(d.id); if (!w) return; const v = !w.fulfilled;
+    await store.saveWish(wishPayload(w, {fulfilled: v})); w.fulfilled = v; renderItems(); if (S._wide && S.sel) renderSide();
+    toast(v ? 'Exaucée 🎉 (bouton « Exaucées » pour la revoir)' : 'Remise dans tes envies', 3000);
+  },
+  delWish: async d => { if (!confirm('Supprimer cette envie ?')) return; await store.deleteWish(d.id); if (S.sel === d.id) S.sel = null; closeSheet(); await go('envies'); toast('Supprimée'); },
+  shareWish: d => { const w = findWish(d.id); if (w) shareLink(w.title, safeHref(w.url) || location.origin + location.pathname); },
+  shareMe: () => shareLink('Mes envies', location.origin + location.pathname + '#/u/' + S.me.handle),
+  search: async () => { const q = ($('#fq') || {}).value || ''; S.fq = q.trim(); S.found = S.fq ? await store.searchUsers(S.fq) : null; render(); const i = $('#fq'); if (i) { i.focus(); i.setSelectionRange(i.value.length, i.value.length); } },
+  openUser: d => openUser(d.handle),
+  follow: async d => { try { await store.follow(d.id); } catch (e) { if (!/duplicate/i.test(e.message)) throw e; } toast('Abonné ✓'); if (d.stay) await openUser(S.user.handle); else { await go('amis'); if (S.fq) await A.search(); } },
+  unfollow: async d => { if (!confirm('Ne plus suivre ? Cette personne ne verra plus tes envies.')) return; await store.unfollow(d.id); if (d.stay) await openUser(S.user.handle); else { await go('amis'); if (S.fq) await A.search(); } },
+  reserve: async d => {
+    if (d.on === '1') { try { await store.reserve(d.id); } catch (e) { if (!/duplicate/i.test(e.message)) throw e; } } else await store.unreserve(d.id);
+    const rs = await store.reservationsFor([d.id]); S.resv[d.id] = rs.map(r => r.user_id); closeSheet(true); renderItems(); openWish(d.id); toast(d.on === '1' ? 'Réservé en secret ✓' : 'Réservation annulée');
+  },
+  migrate: migrateLocal,
+  demo: async () => { await store.addDemo(); await go('envies'); },
+  clearDemo: async () => { await store.clearDemo(); closeSheet(); await go('envies'); },
+  signOut: async () => { await store.signOut(); Object.assign(S, {me: null, wishes: [], lists: [], feed: [], resv: {}, following: [], followers: [], found: null, fq: '', userWishes: [], sel: null, list: 'all'}); closeSheet(); await go('envies'); },
+  editProfile: async () => { const n = await askText('Prénom affiché', 'Ex. Ilian', S.me.name); if (!n) return; const p = await store.updateProfile({name: n.slice(0, 40)}); S.me = {...S.me, ...p}; await go('envies'); },
+  toggleSearch: () => { S.showSearch = !(S.showSearch || S.q); if (!S.showSearch) S.q = ''; render(); const q = $('#q'); if (q) q.focus(); },
+  saveCfg: () => {
+    const u = cleanSbUrl($('#c_url').value), k = $('#c_key').value.trim(), r = $('#c_rel').value.trim(), e = $('#c_err');
+    if (u && !/^https:\/\/[a-z0-9-]+\.supabase\.(co|in)$/i.test(u)) { e.textContent = 'L’URL doit ressembler à https://xxxx.supabase.co'; return; }
+    const kp = keyProblem(k); if (kp) { e.textContent = kp; return; }
+    if ((u && !k) || (!u && k)) { e.textContent = 'Il faut l’URL ET la clé (ou aucune des deux).'; return; }
+    if (r && !/^https:\/\//i.test(r)) { e.textContent = 'Le relais doit commencer par https://'; return; }
+    lsSet('envies.cfg.SUPABASE_URL', u); lsSet('envies.cfg.SUPABASE_ANON_KEY', k); lsSet('envies.cfg.META_RELAY', r);
+    location.reload();
+  },
+};
+
+/* ---------- événements ---------- */
+document.addEventListener('click', e => {
+  const a = e.target.closest('a[href]');
+  if (a) { if (a.classList.contains('bm')) { e.preventDefault(); toast('Glisse ce bouton dans ta barre de favoris', 3500); } return; }
+  const t = e.target.closest('[data-act]'); if (!t) return;
+  const f = A[t.dataset.act]; if (!f) return;
+  e.preventDefault();
+  Promise.resolve().then(() => f({...t.dataset})).catch(err => { console.error(err); toast(friendlyErr(err), 6000); });
+});
+document.addEventListener('change', e => {
+  const t = e.target.closest('[data-change]'); if (!t) return;
+  if (t.dataset.change === 'sort') S.sort = t.value;
+  if (t.dataset.change === 'shop') S.shop = t.value;
+  renderItems();
+});
+document.addEventListener('input', e => { if (e.target.id === 'q') { S.q = e.target.value; renderItems(); } });
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { if (sheetEl) closeSheet(); else if (S.sel) { S.sel = null; render(); } return; }
+  const t = e.target, typing = t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable);
+  if (typing) { if (e.key === 'Enter' && t.id === 'fq') { e.preventDefault(); A.search().catch(err => toast(friendlyErr(err))); } return; }
+  if (sheetEl || e.metaKey || e.ctrlKey || e.altKey) return;
+  if ((e.key === 'n' || e.key === 'N') && S.view === 'envies' && (!cloud() || S.me)) { e.preventDefault(); openAdd(); }
+  else if (e.key === '/') { e.preventDefault(); if (!$('#q')) { if (S.view === 'envies') A.toggleSearch(); } else $('#q').focus(); }
+  else if (e.key === 'Enter' && t.dataset && t.dataset.act === 'openWish') openWish(t.dataset.id);
+});
+// Coller un lien n'importe où (PC : Ctrl+V)
+document.addEventListener('paste', e => {
+  const t = e.target; if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+  if (sheetEl || (cloud() && !S.me)) return;
+  const u = extractUrl((e.clipboardData || window.clipboardData).getData('text'));
+  if (u) { e.preventDefault(); openAdd(u); }
+});
+// Glisser-déposer un lien depuis un autre onglet
+const isLinkDrag = e => e.dataTransfer && [...e.dataTransfer.types].some(t => t === 'text/uri-list' || t === 'text/plain');
+document.addEventListener('dragover', e => { if (isLinkDrag(e) && !sheetEl) { e.preventDefault(); document.body.classList.add('drop'); } });
+document.addEventListener('dragleave', e => { if (!e.relatedTarget) document.body.classList.remove('drop'); });
+document.addEventListener('drop', e => {
+  document.body.classList.remove('drop'); if (!e.dataTransfer || sheetEl) return;
+  const u = extractUrl(e.dataTransfer.getData('text/uri-list') || e.dataTransfer.getData('text/plain'));
+  if (u) { e.preventDefault(); openAdd(u); }
+});
+// Images cassées → lettre de remplacement
+document.addEventListener('error', e => {
+  const i = e.target; if (!i || i.tagName !== 'IMG') return;
+  if (i.closest('.thumbs')) { i.remove(); return; }
+  if (i.dataset.l !== undefined) { const d = document.createElement('div'); d.className = 'ph'; d.textContent = i.dataset.l || '?'; i.replaceWith(d); } else i.style.display = 'none';
+}, true);
+// Revenir sur l'appli (iPhone ↔ PC) → on recharge les données
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && !sheetEl && cloud() && S.me && S.view !== 'user' && Date.now() - S.lastLoad > 15000) go(S.view, true);
+});
+window.addEventListener('hashchange', () => { const m = location.hash.match(/^#\/u\/([a-z0-9_.]+)/i); if (m && cloud()) openUser(m[1]); });
+let rT, lastCols = gridCols(); window.addEventListener('resize', () => { clearTimeout(rT); rT = setTimeout(() => { if (gridCols() !== lastCols) { lastCols = gridCols(); renderItems(); } }, 150); });
+
+boot().catch(e => { console.error(e); toast(friendlyErr(e), 6000); render(); });
+</script>
+</body>
+</html>
