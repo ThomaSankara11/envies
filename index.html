@@ -74,6 +74,20 @@ svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stro
 .card .pr.na{color:var(--dim);font-size:12px}
 .ph{width:100%;height:100%;display:grid;place-items:center;font-family:var(--serif);font-style:italic;font-size:40px;color:var(--dim);background:var(--surface2)}
 .badge{position:absolute;top:8px;right:8px;z-index:1;font-size:11px;padding:3px 9px;border-radius:99px;background:rgba(111,207,151,.92);color:#08210f}
+.card .ck{display:none}
+.card.chk .ck{display:grid;position:absolute;top:8px;right:8px;z-index:3;width:26px;height:26px;border-radius:50%;border:2px solid #fff;background:rgba(0,0,0,.4);place-items:center;color:transparent}
+.card.chk .ck .i{width:15px;height:15px;stroke-width:2.6}
+.card.chk.picked .ck{background:var(--acc);border-color:var(--acc);color:var(--accT)}
+.card.chk.picked{outline:2px solid var(--acc);outline-offset:-2px}
+.card.chk:not(.picked) .im{opacity:.82}
+.multi .gal .gnav{display:none!important}
+.mhead{display:flex;align-items:center;gap:12px;margin:0 2px 14px;min-height:38px}
+.mhead .sp{flex:1}
+.mhead b{font-weight:600;font-size:14px;color:var(--mut)}
+.tabbar.mact{gap:8px;padding:6px}
+.tabbar.mact button{padding:12px 24px;font-weight:600;white-space:nowrap}
+.tabbar.mact .del{background:#e5484d;color:#fff}
+.tabbar.mact .del:disabled{opacity:.4;cursor:default}
 .badge.done{left:8px;right:auto;background:rgba(11,11,12,.78);color:#f2f2f3;backdrop-filter:blur(6px)}
 .is-done{opacity:.45}
 
@@ -114,8 +128,25 @@ svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stro
 .pimg .ph{aspect-ratio:4/3;font-size:64px}
 .thumbs{display:flex;gap:8px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none}
 .thumbs::-webkit-scrollbar{display:none}
-.thumbs img{width:60px;height:60px;object-fit:contain;background:#fff;border-radius:10px;border:2px solid var(--line);flex:none;cursor:pointer}
-.thumbs img.on{border-color:var(--acc)}
+.thumbs .tb{position:relative;flex:none;width:66px;height:66px;border-radius:11px;border:2px solid var(--line);background:#fff;cursor:pointer;overflow:hidden;opacity:.55}
+.thumbs .tb.on{border-color:var(--acc);opacity:1}
+.thumbs .tb img{display:block;width:100%;height:100%;object-fit:contain}
+.thumbs .tb b{position:absolute;top:3px;right:3px;min-width:19px;height:19px;padding:0 5px;border-radius:10px;background:var(--acc);color:var(--accT);font-size:11px;font-weight:700;display:grid;place-items:center}
+.lbl small{font-weight:400;color:var(--dim);margin-left:4px}
+/* galerie : défilement des photos d'une envie */
+.gal{position:relative}
+.gal .track{display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+.gal .track::-webkit-scrollbar{display:none}
+.gal .sl{flex:0 0 100%;scroll-snap-align:center;scroll-snap-stop:always;display:flex;align-items:center;justify-content:center;background:#fff}
+.card .gal .sl img{display:block;width:100%;height:100%;object-fit:contain}
+.pimg .gal .track{height:min(52vh,430px)}
+.pimg .gal .sl img{display:block;width:100%;height:100%;max-height:none;object-fit:contain}
+.gal .dots{position:absolute;left:0;right:0;bottom:7px;display:flex;justify-content:center;gap:4px;pointer-events:none}
+.gal .dots i{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.85);box-shadow:0 0 0 1px rgba(0,0,0,.28)}
+.gal .dots i.on{background:#111;box-shadow:0 0 0 1px rgba(255,255,255,.7)}
+.gal .gnav{display:none;position:absolute;top:50%;transform:translateY(-50%);width:28px;height:28px;border-radius:50%;background:rgba(20,20,22,.62);color:#fff;font-size:18px;line-height:1;place-items:center;padding:0 0 2px}
+.gal .gnav.prev{left:6px}.gal .gnav.next{right:6px}
+@media(hover:hover){.card:hover .gal .gnav,.pimg:hover .gal .gnav{display:grid}}
 .lbl{font-size:12px;font-weight:600;color:var(--mut);margin:12px 0 6px}
 .fld{width:100%;background:var(--surface2);border:1px solid transparent;border-radius:12px;padding:11px 13px;min-height:46px;color:var(--txt)}
 .fld:focus{outline:0;border-color:var(--acc)}
@@ -269,6 +300,7 @@ const I = {
   back: '<svg class="i" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>',
   x: '<svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>',
   check: '<svg class="i" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  pick: '<svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M8.3 12.4l2.7 2.6 4.7-5.2"/></svg>',
   ext: '<svg class="i" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1h5"/></svg>',
   heart: '<svg class="i" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 017-2.6A4 4 0 0119 10c0 5.6-7 10-7 10z"/></svg>',
   home: '<svg class="i" viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v8a1 1 0 01-1 1h-4v-6H9v6H5a1 1 0 01-1-1z"/></svg>',
@@ -334,6 +366,7 @@ function makeLocalStore() {
       d.wishes.unshift(n); save(d); return n;
     },
     async deleteWish(id) { const d = load(); d.wishes = d.wishes.filter(x => x.id !== id); save(d); },
+    async deleteWishes(ids) { const s = new Set(ids), d = load(); d.wishes = d.wishes.filter(x => !s.has(x.id)); save(d); },
     async myLists() { return load().lists; },
     async saveList(l) {
       const d = load();
@@ -395,6 +428,7 @@ async function makeSupaStore() {
       return ck(await sb.from('wishes').insert(row).select().single());
     },
     async deleteWish(id) { ck(await sb.from('wishes').delete().eq('id', id)); },
+    async deleteWishes(ids) { ck(await sb.from('wishes').delete().in('id', ids)); },
     async myLists() { return ck(await sb.from('lists').select('*').eq('owner_id', me.id).order('created_at')); },
     async saveList(l) {
       if (l.id) return ck(await sb.from('lists').update({name: l.name, is_private: !!l.is_private}).eq('id', l.id).select().single());
@@ -437,7 +471,7 @@ const S = {
   view: 'envies', me: null, wishes: [], lists: [], list: 'all', sort: 'recent', shop: '', showDone: false, q: '',
   feed: [], following: [], followers: [], resv: {}, found: null, fq: '',
   user: null, userWishes: [], userFollowers: 0, userFollowing: false, userFollowsMe: false,
-  busy: false, localCount: 0, sel: null, pendingAdd: '', lastLoad: 0, _wide: false,
+  busy: false, multi: false, chk: [], localCount: 0, sel: null, pendingAdd: '', lastLoad: 0, _wide: false,
 };
 let store = makeLocalStore();
 const cloud = () => store.kind === 'cloud';
@@ -468,7 +502,7 @@ async function boot() {
   if (addU) { if (cloud() && !S.me) { S.pendingAdd = addU; openAuth('login', 'Connecte-toi pour ajouter ce produit'); } else openAdd(addU); }
 }
 async function go(view, quiet) {
-  if (view !== S.view) { S.sel = null; S.q = ''; }
+  if (view !== S.view) { S.sel = null; S.q = ''; S.multi = false; S.chk = []; }
   S.view = view; S.user = null;
   if (!quiet) { S.busy = true; render(); }
   try {
@@ -508,7 +542,7 @@ async function openUser(handle) {
    AFFICHAGE
    ===================================================================== */
 function render() {
-  S._wide = false; S.sel = null;
+  S._wide = false; S.sel = null; document.body.classList.toggle('multi', !!S.multi);
   $('#root').innerHTML = `<main class="main">${viewHTML()}</main>${bottomNav()}`;
   renderItems();
 }
@@ -519,6 +553,7 @@ function viewHTML() {
   return viewEnvies();
 }
 function bottomNav() {
+  if (S.multi && S.view === 'envies') { const n = chkVis().length; return `<nav class="tabbar mact"><button data-act="endMulti">Annuler</button><button class="del" data-act="delMulti" ${n ? '' : 'disabled'}>Supprimer${n ? ' (' + n + ')' : ''}</button></nav>`; }
   const v = S.view === 'user' ? 'amis' : S.view;
   return `<nav class="tabbar">${[['feed', 'Feed'], ['amis', 'Amis'], ['envies', 'Envies']].map(([k, t]) => `<button class="${v === k ? 'on' : ''}" data-act="tab" data-v="${k}">${t}</button>`).join('')}</nav>`;
 }
@@ -526,6 +561,25 @@ function avatarHTML(p, size) {
   const ini = ((p && (p.name || p.handle)) || '?').trim().charAt(0) || '?', src = p && safeImg(p.avatar_url);
   const st = size ? ` style="width:${size}px;height:${size}px;font-size:${Math.round(size * .5)}px"` : '';
   return `<div class="av"${st}>${src ? `<img src="${esc(src)}" alt="">` : esc(ini)}</div>`;
+}
+const gallery = w => [...new Set([w.image_url, ...(w.images || [])].map(safeImg).filter(Boolean))].slice(0, 8);
+function galInner(g, w, cls) {
+  const l = esc(((w.title || '?').trim().charAt(0) || '?').toUpperCase());
+  return `<div class="${cls}gal" data-n="${g.length}"><div class="track">${g.map((u, i) => `<div class="sl"><img src="${esc(u)}" alt="" ${i ? 'loading="lazy"' : ''} referrerpolicy="no-referrer" data-l="${l}"></div>`).join('')}</div>
+    <div class="dots">${g.map((_, i) => `<i class="${i ? '' : 'on'}"></i>`).join('')}</div>
+    <button class="gnav prev" data-act="slide" data-d="-1" aria-label="Photo précédente">‹</button><button class="gnav next" data-act="slide" data-d="1" aria-label="Photo suivante">›</button></div>`;
+}
+function galCard(w) {
+  const g = gallery(w), l = esc(((w.title || '?').trim().charAt(0) || '?').toUpperCase());
+  if (g.length > 1) return galInner(g, w, 'im ');
+  return g.length ? `<div class="im"><img src="${esc(g[0])}" alt="" loading="lazy" referrerpolicy="no-referrer" data-l="${l}"></div>` : `<div class="im ph">${l}</div>`;
+}
+function detailImg(w) { const g = gallery(w); return `<div class="pimg">${g.length > 1 ? galInner(g, w, '') : imgTag(w)}</div>`; }
+function fixGal(g) {   // une photo cassée disparaît du défilement ; plus qu'une → image simple
+  const sls = [...g.querySelectorAll('.sl')], n = sls.length;
+  if (n === 0) { const d = document.createElement('div'); d.className = 'ph'; d.textContent = '?'; g.replaceWith(d); return; }
+  g.dataset.n = n; g.querySelector('.dots').innerHTML = sls.map((_, i) => `<i class="${i ? '' : 'on'}"></i>`).join('');
+  if (n < 2) { g.querySelector('.dots').remove(); g.querySelectorAll('.gnav').forEach(b => b.remove()); }
 }
 function imgTag(w) {
   const s = safeImg(w.image_url), l = esc(((w.title || '?').trim().charAt(0) || '?').toUpperCase());
@@ -560,8 +614,11 @@ const currentListName = () => S.list === 'all' ? 'Mes envies' : (listName(S.list
 
 function viewEnvies() {
   if (cloud() && !S.me) return headerMe() + connectCard('Avec un compte, tes envies sont les mêmes sur ton iPhone et ton PC, et tu peux les partager avec tes amis.');
+  const bar = S.multi
+    ? `<div class="mhead"><button class="link" id="mall" data-act="multiAll">Tout sélectionner</button><span class="sp"></span><b id="mcount">Aucune sélection</b></div>`
+    : `<div class="bar">${sortSel()}${shopSel()}${doneChip()}<span class="sp"></span>${S.wishes.length ? `<button class="ib" data-act="startMulti" aria-label="Sélectionner plusieurs envies" title="Sélectionner plusieurs envies">${I.pick}</button>` : ''}<button class="ib" data-act="toggleSearch" aria-label="Rechercher" title="Rechercher ( / )">${I.search}</button><button class="plus" data-act="openAdd" aria-label="Ajouter une envie" title="Ajouter ( N )">${I.plus}</button></div>`;
   return `${headerMe()}${bannersHTML()}${listChips()}
-    <div class="bar">${sortSel()}${shopSel()}${doneChip()}<span class="sp"></span><button class="ib" data-act="toggleSearch" aria-label="Rechercher" title="Rechercher ( / )">${I.search}</button><button class="plus" data-act="openAdd" aria-label="Ajouter une envie" title="Ajouter ( N )">${I.plus}</button></div>
+    ${bar}
     ${S.showSearch || S.q ? searchBox() : ''}<div id="items"></div>`;
 }
 function viewFeed() {
@@ -596,9 +653,8 @@ function viewUser() {
 /* ---------- cartes ---------- */
 function opts(w) { const mine = isMine(w); return {owner: w.owner || null, reserved: !mine && (S.resv[w.id] || []).length > 0, mine}; }
 function card(w) {
-  const o = opts(w), p = priceTxt(w), s = safeImg(w.image_url), l = esc(((w.title || '?').trim().charAt(0) || '?').toUpperCase());
-  const im = s ? `<div class="im"><img src="${esc(s)}" alt="" loading="lazy" referrerpolicy="no-referrer" data-l="${l}"></div>` : `<div class="im ph">${l}</div>`;
-  return `<article class="card ${w.fulfilled ? 'is-done' : ''}" data-act="openWish" data-id="${esc(w.id)}" tabindex="0">${w.fulfilled ? '<span class="badge done">exaucée</span>' : ''}${o.reserved ? '<span class="badge">Réservé</span>' : ''}${im}
+  const o = opts(w), p = priceTxt(w), im = galCard(w), m = S.multi && S.view === 'envies';
+  return `<article class="card ${w.fulfilled ? 'is-done' : ''} ${m ? 'chk' : ''} ${m && S.chk.includes(w.id) ? 'picked' : ''}" data-act="${m ? 'togChk' : 'openWish'}" data-id="${esc(w.id)}" tabindex="0">${m ? `<span class="ck">${I.check}</span>` : ''}${w.fulfilled ? '<span class="badge done">exaucée</span>' : ''}${o.reserved ? '<span class="badge">Réservé</span>' : ''}${im}
     <div class="meta">${o.owner ? `<div class="by"><b>@${esc(o.owner.handle)}</b></div>` : ''}<div class="shop">${esc(shopOf(w))}</div><div class="ttl">${esc(w.title)}</div>${p ? `<div class="pr num">${esc(p)}</div>` : '<div class="pr na">Prix à vérifier</div>'}</div></article>`;
 }
 function sortWishes(a) {
@@ -686,7 +742,7 @@ function detailHTML(w) {
       <p class="mini" style="margin:10px 2px 0">${esc(owner ? '@' + owner.handle : 'La personne')} ne voit pas les réservations ; ses autres amis oui, pour éviter les doublons.</p>
       <div class="links"><button class="link" data-act="shareWish" data-id="${esc(w.id)}">Partager</button></div>`;
   }
-  return `<div class="pimg">${imgTag(w)}</div><div class="dshop">${owner ? '@' + esc(owner.handle) + ' · ' : ''}${esc(shopOf(w))}</div><h3 class="dtitle">${esc(w.title)}</h3>
+  return `${detailImg(w)}<div class="dshop">${owner ? '@' + esc(owner.handle) + ' · ' : ''}${esc(shopOf(w))}</div><h3 class="dtitle">${esc(w.title)}</h3>
     <div class="dprice num">${p ? esc(p) : '<span class="mut" style="font-size:14px;font-weight:500">Prix à vérifier</span>'}<small>${esc(host(w.url))}${w.created_at ? ' · ' + esc(fdate(w.created_at)) : ''}</small></div>
     ${w.note ? `<p class="dnote">${esc(w.note)}</p>` : ''}${acts}`;
 }
@@ -712,14 +768,24 @@ function askText(title, ph, val) {
 
 /* ---- ajout / modification ---- */
 let FORM = null;
+function thumbsHTML() {
+  const pool = FORM.images, sel = FORM.sel;
+  if (!pool.length) return '';
+  return `<div class="lbl">Photos à garder<small>touche pour choisir · la n°1 est la couverture</small></div><div class="thumbs">${pool.map((u, i) => { const k = sel.indexOf(u);
+    return `<div class="tb ${k >= 0 ? 'on' : ''}" data-act="togImg" data-i="${i}"><img src="${esc(safeImg(u))}" referrerpolicy="no-referrer" alt="">${k >= 0 ? `<b>${k + 1}</b>` : ''}</div>`; }).join('')}</div>`;
+}
+function refreshImgs() {   // met à jour l'aperçu et les vignettes sans recharger tout le formulaire
+  FORM.w.image_url = FORM.sel[0] || '';
+  const a = $('#f_prev'), b = $('#f_th'); if (a) a.innerHTML = imgTag(FORM.w); if (b) b.innerHTML = thumbsHTML();
+}
+const isData = u => String(u).startsWith('data:');
 function formHTML() {
-  const w = FORM.w, imgs = FORM.images;
-  const th = imgs.length > 1 ? `<div class="lbl">Choisir une autre image</div><div class="thumbs">${imgs.map((u, i) => `<img src="${esc(safeImg(u))}" referrerpolicy="no-referrer" data-act="pickImg" data-i="${i}" class="${u === w.image_url ? 'on' : ''}" alt="">`).join('')}</div>` : '';
+  const w = FORM.w;
   const lists = `<select id="f_list" class="fld"><option value="">Aucune liste</option>${S.lists.map(l => `<option value="${esc(l.id)}" ${w.list_id === l.id ? 'selected' : ''}>${esc(l.name)}</option>`).join('')}<option value="__new">＋ Nouvelle liste…</option></select>`;
   const cur = ['EUR', 'CHF', 'USD', 'GBP', 'CAD', 'JPY']; if (w.currency && !cur.includes(w.currency)) cur.push(w.currency);
   return `<h2>${FORM.mode === 'edit' ? 'Modifier l’envie' : 'Ajouter une envie'}</h2><p class="hint">${FORM.mode === 'edit' ? 'Corrige ce qui a mal été récupéré' : 'Vérifie les infos puis ajoute'}</p>
-    <div class="pimg">${imgTag(w)}</div>${th}
-    <div style="display:flex;gap:8px;margin:0 0 4px"><label class="btn sm ghost">📷 Photo de l’appareil<input id="f_file" type="file" accept="image/*" hidden></label>${w.image_url ? '<button class="btn sm ghost" data-act="removeImg">Retirer l’image</button>' : ''}</div>
+    <div class="pimg" id="f_prev">${imgTag(w)}</div><div id="f_th">${thumbsHTML()}</div>
+    <div style="display:flex;gap:8px;margin:0 0 4px;flex-wrap:wrap"><label class="btn sm ghost">📷 Photo de l’appareil<input id="f_file" type="file" accept="image/*" hidden></label>${w.url ? '<button class="btn sm ghost" id="f_more" data-act="moreImgs">🔄 Chercher d’autres photos</button>' : ''}</div>
     <div class="lbl">Nom du produit *</div><input id="f_title" class="fld" value="${esc(w.title)}" placeholder="Ex. Veste imperméable" maxlength="300">
     <div class="frow"><div><div class="lbl">Marque</div><input id="f_brand" class="fld" value="${esc(w.brand)}" placeholder="Facultatif" maxlength="120"></div><div><div class="lbl">Boutique</div><input id="f_shop" class="fld" value="${esc(w.shop)}" placeholder="Ex. amazon.fr" maxlength="120"></div></div>
     <div class="frow"><div><div class="lbl">Prix</div><input id="f_price" class="fld" inputmode="decimal" value="${w.price ?? ''}" placeholder="0,00"></div><div class="w1"><div class="lbl">Devise</div><select id="f_cur" class="fld">${cur.map(c => `<option ${w.currency === c ? 'selected' : ''}>${c}</option>`).join('')}</select></div></div>
@@ -740,7 +806,7 @@ function mountForm() {
   const f = $('#f_file', sh);
   if (f) f.onchange = async () => {
     if (!f.files[0]) return;
-    try { readForm(); const d = await resizeImage(f.files[0]); FORM.w.image_url = d; FORM.images = [d, ...FORM.images.filter(x => !String(x).startsWith('data:'))]; mountForm(); }
+    try { readForm(); const d = await resizeImage(f.files[0]); FORM.images = [d, ...FORM.images.filter(x => !isData(x))]; FORM.sel = [d, ...FORM.sel.filter(x => !isData(x))].slice(0, 8); FORM.w.image_url = d; mountForm(); }
     catch { toast('Image illisible (format non pris en charge ?)'); }
   };
   const l = $('#f_list', sh);
@@ -748,7 +814,7 @@ function mountForm() {
 }
 function openAdd(prefill) {
   if (cloud() && !S.me) { S.pendingAdd = typeof prefill === 'string' ? prefill : ''; return openAuth('signup', 'Crée ton compte pour enregistrer tes envies'); }
-  FORM = {mode: 'add', images: [], w: {title: '', brand: '', shop: '', price: null, currency: 'EUR', note: '', url: '', image_url: '', list_id: S.view === 'envies' && S.list !== 'all' ? S.list : null}};
+  FORM = {mode: 'add', images: [], sel: [], w: {title: '', brand: '', shop: '', price: null, currency: 'EUR', note: '', url: '', image_url: '', list_id: S.view === 'envies' && S.list !== 'all' ? S.list : null}};
   const sh = openSheet(`<h2>Ajouter une envie</h2><p class="hint">Colle le lien de n’importe quel produit</p>
     <div class="paste"><input id="a_url" class="fld" placeholder="https://…" inputmode="url" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="go"><button class="btn" id="a_paste" style="min-height:46px">Coller</button></div>
     <div id="a_body"><p style="text-align:center;margin:22px 0 0"><button class="link dim" data-act="addManual">Ou ajouter sans lien</button></p></div>`);
@@ -763,7 +829,7 @@ function openAdd(prefill) {
     FORM.w.url = url; FORM.w.shop = host(url);
     if (meta) {
       Object.assign(FORM.w, {title: meta.title, brand: meta.brand, shop: meta.shop || host(url), price: meta.price, currency: meta.currency || 'EUR', image_url: meta.images[0] || ''});
-      FORM.images = meta.images;
+      FORM.images = meta.images; FORM.sel = meta.images.slice(0, 1);
       if (meta.price == null) toast('Prix non trouvé : ajoute-le à la main', 3500);
     } else toast('Page illisible : remplis les infos à la main', 3500);
     mountForm();
@@ -778,14 +844,14 @@ function openAdd(prefill) {
   if (typeof prefill === 'string' && prefill) { inp.value = prefill; run(); }
   else setTimeout(() => { if (matchMedia('(hover:hover)').matches && sheetEl) inp.focus(); }, 260);
 }
-function openEdit(w) { FORM = {mode: 'edit', images: [...new Set([w.image_url, ...(w.images || [])].filter(Boolean))], w: {...w}}; mountForm(); }
+function openEdit(w) { const g = [...new Set([w.image_url, ...(w.images || [])].map(safeImg).filter(Boolean))].slice(0, 12); FORM = {mode: 'edit', images: g, sel: g.slice(0, 8), w: {...w}}; mountForm(); }
 async function saveForm() {
   readForm(); const w = FORM.w, err = $('#f_err');
   if (!w.title) { err.textContent = 'Donne un nom à cette envie.'; $('#f_title').focus(); return; }
   if (w.url && !safeHref(w.url)) { const u = extractUrl(w.url); if (u) w.url = u; else { err.textContent = 'Le lien doit commencer par https://'; return; } }
   const btn = $('[data-act=saveForm]'); if (btn) btn.disabled = true;
   try {
-    await store.saveWish({...w, images: FORM.images.filter(u => !String(u).startsWith('data:')).slice(0, 12)});
+    await store.saveWish({...w, image_url: FORM.sel[0] || '', images: FORM.sel.filter(u => !isData(u)).slice(0, 8)});
     const adding = FORM.mode === 'add'; closeSheet(); await go('envies'); toast(adding ? 'Ajouté ✓' : 'Enregistré ✓');
   } catch (e) { if (btn) btn.disabled = false; err.textContent = friendlyErr(e); }
 }
@@ -888,6 +954,16 @@ async function migrateLocal() {
   } catch (e) { toast(friendlyErr(e), 6000); await go('envies'); }
 }
 
+/* ---- sélection de plusieurs envies (comme sur iPhone) ---- */
+function chkVis() { const vis = new Set(itemsFor().map(w => w.id)); return S.chk.filter(id => vis.has(id)); }   // on ne compte que ce qui est affiché
+function updateMulti() {
+  const n = chkVis().length, c = $('#mcount'), nav = $('.tabbar'), all = $('#mall'), tot = itemsFor().length;
+  if (c) c.textContent = n ? n + ' sélectionnée' + (n > 1 ? 's' : '') : 'Aucune sélection';
+  if (all) all.textContent = n && n === tot ? 'Tout désélectionner' : 'Tout sélectionner';
+  if (nav) nav.outerHTML = bottomNav();
+}
+function setMulti(on) { S.multi = on; S.chk = []; render(); if (on) updateMulti(); }
+
 /* =====================================================================
    ACTIONS
    ===================================================================== */
@@ -900,9 +976,38 @@ const A = {
   openWish: d => openWish(d.id),
   editWish: d => { const w = findWish(d.id); if (w) openEdit(w); },
   addManual: () => { FORM.w.url = ''; mountForm(); setTimeout(() => { const t = $('#f_title'); if (t) t.focus(); }, 250); },
-  pickImg: d => { readForm(); FORM.w.image_url = FORM.images[+d.i]; mountForm(); },
-  removeImg: () => { readForm(); FORM.w.image_url = ''; mountForm(); },
+  togImg: d => {
+    const u = FORM.images[+d.i], k = FORM.sel.indexOf(u);
+    if (k >= 0) FORM.sel.splice(k, 1); else if (FORM.sel.length >= 8) { toast('8 photos au maximum par envie'); return; } else FORM.sel.push(u);
+    refreshImgs();
+  },
+  moreImgs: async () => {
+    readForm(); const url = FORM.w.url, b = $('#f_more'); if (!url || !b) return;
+    b.disabled = true; b.textContent = 'Recherche…';
+    const meta = await fetchMeta(url); const sh = sheetEl;
+    if (!sh || !$('#f_more')) return;
+    const fresh = ((meta && meta.images) || []).filter(u => !FORM.images.includes(u));
+    FORM.images = [...FORM.images, ...fresh].slice(0, 24);
+    toast(fresh.length ? fresh.length + ' photo' + (fresh.length > 1 ? 's' : '') + ' trouvée' + (fresh.length > 1 ? 's' : '') : 'Pas d’autre photo trouvée sur cette page', 3500);
+    const bb = $('#f_more'); if (bb) { bb.disabled = false; bb.textContent = '🔄 Chercher d’autres photos'; }
+    refreshImgs();
+  },
+  slide: d => { const g = d._el && d._el.closest('.gal'), t = g && g.querySelector('.track'); if (t) t.scrollBy({left: t.clientWidth * (+d.d || 1), behavior: 'smooth'}); },
   saveForm,
+  startMulti: () => setMulti(true),
+  endMulti: () => setMulti(false),
+  togChk: d => {
+    const k = S.chk.indexOf(d.id); if (k >= 0) S.chk.splice(k, 1); else S.chk.push(d.id);
+    const el = [...document.querySelectorAll('.card')].find(c => c.dataset.id === d.id); if (el) el.classList.toggle('picked', k < 0);
+    updateMulti();
+  },
+  multiAll: () => { const ids = itemsFor().map(w => w.id), all = ids.length && chkVis().length === ids.length; S.chk = all ? [] : ids; renderItems(); updateMulti(); },
+  delMulti: async () => {
+    const ids = chkVis(); if (!ids.length) return;
+    if (!confirm('Supprimer ' + (ids.length > 1 ? 'ces ' + ids.length + ' envies' : 'cette envie') + ' ? C’est définitif.')) return;
+    await store.deleteWishes(ids);
+    setMulti(false); await go('envies'); toast(ids.length + ' envie' + (ids.length > 1 ? 's' : '') + ' supprimée' + (ids.length > 1 ? 's' : ''));
+  },
   setList: d => { S.list = d.id; S.shop = ''; if (S.view !== 'envies') return go('envies'); S.sel = null; render(); },
   toggleDone: () => { S.showDone = !S.showDone; render(); },
   clearQ: () => { S.q = ''; render(); },
@@ -954,7 +1059,7 @@ document.addEventListener('click', e => {
   const t = e.target.closest('[data-act]'); if (!t) return;
   const f = A[t.dataset.act]; if (!f) return;
   e.preventDefault();
-  Promise.resolve().then(() => f({...t.dataset})).catch(err => { console.error(err); toast(friendlyErr(err), 6000); });
+  Promise.resolve().then(() => f({...t.dataset, _el: t})).catch(err => { console.error(err); toast(friendlyErr(err), 6000); });
 });
 document.addEventListener('change', e => {
   const t = e.target.closest('[data-change]'); if (!t) return;
@@ -962,15 +1067,15 @@ document.addEventListener('change', e => {
   if (t.dataset.change === 'shop') S.shop = t.value;
   renderItems();
 });
-document.addEventListener('input', e => { if (e.target.id === 'q') { S.q = e.target.value; renderItems(); } });
+document.addEventListener('input', e => { if (e.target.id === 'q') { S.q = e.target.value; renderItems(); if (S.multi) updateMulti(); } });
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { if (sheetEl) closeSheet(); else if (S.sel) { S.sel = null; render(); } return; }
+  if (e.key === 'Escape') { if (sheetEl) closeSheet(); else if (S.multi) setMulti(false); else if (S.sel) { S.sel = null; render(); } return; }
   const t = e.target, typing = t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable);
   if (typing) { if (e.key === 'Enter' && t.id === 'fq') { e.preventDefault(); A.search().catch(err => toast(friendlyErr(err))); } return; }
   if (sheetEl || e.metaKey || e.ctrlKey || e.altKey) return;
   if ((e.key === 'n' || e.key === 'N') && S.view === 'envies' && (!cloud() || S.me)) { e.preventDefault(); openAdd(); }
   else if (e.key === '/') { e.preventDefault(); if (!$('#q')) { if (S.view === 'envies') A.toggleSearch(); } else $('#q').focus(); }
-  else if (e.key === 'Enter' && t.dataset && t.dataset.act === 'openWish') openWish(t.dataset.id);
+  else if (e.key === 'Enter' && t.dataset && (t.dataset.act === 'openWish' || t.dataset.act === 'togChk')) A[t.dataset.act]({...t.dataset});
 });
 // Coller un lien n'importe où (PC : Ctrl+V)
 document.addEventListener('paste', e => {
@@ -988,10 +1093,23 @@ document.addEventListener('drop', e => {
   const u = extractUrl(e.dataTransfer.getData('text/uri-list') || e.dataTransfer.getData('text/plain'));
   if (u) { e.preventDefault(); openAdd(u); }
 });
+// Galerie : pastille active selon la photo affichée
+document.addEventListener('scroll', e => {
+  const t = e.target; if (!t || !t.classList || !t.classList.contains('track')) return;
+  const k = Math.round(t.scrollLeft / Math.max(1, t.clientWidth));
+  t.parentElement.querySelectorAll('.dots i').forEach((d, j) => d.classList.toggle('on', j === k));
+}, true);
+// Galerie d'une carte : la hauteur suit la 1re photo (la grille ne saute pas quand les autres se chargent)
+document.addEventListener('load', e => {
+  const i = e.target; if (!i || i.tagName !== 'IMG') return;
+  const sl = i.closest('.card .gal .sl'); if (!sl || sl !== sl.parentElement.firstElementChild) return;
+  sl.parentElement.style.height = i.getBoundingClientRect().height + 'px';
+}, true);
 // Images cassées → lettre de remplacement
 document.addEventListener('error', e => {
   const i = e.target; if (!i || i.tagName !== 'IMG') return;
-  if (i.closest('.thumbs')) { i.remove(); return; }
+  const sl = i.closest('.gal .sl'); if (sl) { const g = sl.closest('.gal'); const first = sl === sl.parentElement.firstElementChild; sl.remove(); if (first) g.querySelector('.track').style.height = ''; fixGal(g); return; }
+  if (i.closest('.thumbs')) { const tb = i.closest('.tb'); if (tb) tb.style.display = 'none'; return; }
   if (i.dataset.l !== undefined) { const d = document.createElement('div'); d.className = 'ph'; d.textContent = i.dataset.l || '?'; i.replaceWith(d); } else i.style.display = 'none';
 }, true);
 // Revenir sur l'appli (iPhone ↔ PC) → on recharge les données
