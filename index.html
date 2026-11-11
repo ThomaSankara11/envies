@@ -711,7 +711,43 @@ function openSheet(html) {
   sheetEl.addEventListener('click', e => { if (e.target === sheetEl && sheetEl._down) closeSheet(); });
   document.body.appendChild(sheetEl); document.body.classList.add('noscroll');
   requestAnimationFrame(() => sheetEl && sheetEl.classList.add('on'));
-  return sheetEl.querySelector('.sheet');
+  const sh = sheetEl.querySelector('.sheet'); swipeToClose(sheetEl, sh);
+  return sh;
+}
+/* Tirer la fiche vers le bas pour la fermer (comme sur iPhone) : seulement quand on est tout en haut de la fiche */
+function swipeToClose(box, sh) {
+  let x0 = 0, y0 = 0, dy = 0, t0 = 0, track = false, drag = false;
+  box.addEventListener('touchstart', e => {
+    track = e.touches.length === 1; drag = false; dy = 0;
+    if (track) { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; t0 = Date.now(); }
+  }, {passive: true});
+  box.addEventListener('touchmove', e => {
+    if (!track) return;
+    const t = e.touches[0], mx = t.clientX - x0, my = t.clientY - y0;
+    if (!drag) {
+      if (Math.abs(mx) < 8 && Math.abs(my) < 8) return;
+      if (my > 0 && my > Math.abs(mx) && sh.scrollTop <= 0) { drag = true; y0 = t.clientY; t0 = Date.now(); }
+      else { track = false; return; }
+    }
+    e.preventDefault();
+    dy = Math.max(0, t.clientY - y0);
+    sh.style.transition = 'none'; sh.style.transform = 'translateY(' + dy + 'px)';
+    box.style.background = 'rgba(0,0,0,' + (0.5 * Math.max(0, 1 - dy / 450)).toFixed(3) + ')';
+  }, {passive: false});
+  const end = () => {
+    if (!drag) { track = false; return; }
+    track = false; drag = false;
+    const fast = dy / Math.max(1, Date.now() - t0) > 0.3;
+    if (dy > 110 || (fast && dy > 40)) {
+      sh.style.transition = 'transform .2s ease-in'; sh.style.transform = 'translateY(105%)';
+      box.style.transition = 'background .2s'; box.style.background = 'rgba(0,0,0,0)';
+      closeSheet();
+    } else {
+      sh.style.transition = 'transform .2s'; sh.style.transform = ''; box.style.background = '';
+      setTimeout(() => { sh.style.transition = ''; }, 220);
+    }
+  };
+  box.addEventListener('touchend', end); box.addEventListener('touchcancel', end);
 }
 function closeSheet(instant) {
   if (!sheetEl) return;
