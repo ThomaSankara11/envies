@@ -471,7 +471,7 @@ const S = {
   view: 'envies', me: null, wishes: [], lists: [], list: 'all', sort: 'recent', shop: '', showDone: false, q: '',
   feed: [], following: [], followers: [], resv: {}, found: null, fq: '',
   user: null, userWishes: [], userFollowers: 0, userFollowing: false, userFollowsMe: false,
-  busy: false, multi: false, chk: [], localCount: 0, sel: null, pendingAdd: '', lastLoad: 0, _wide: false,
+  busy: false, multi: false, chk: [], localCount: 0, sel: null, pendingAdd: '', pendingUser: '', lastLoad: 0, _wide: false,
 };
 let store = makeLocalStore();
 const cloud = () => store.kind === 'cloud';
@@ -484,8 +484,24 @@ const findWish = id => [...S.wishes, ...S.feed, ...S.userWishes].find(w => w.id 
 const listName = id => { const l = S.lists.find(x => x.id === id); return l ? l.name : ''; };
 const wishPayload = (w, extra = {}) => ({id: w.id, title: w.title, brand: w.brand, shop: w.shop, price: w.price, currency: w.currency, note: w.note, url: w.url, image_url: w.image_url, images: w.images || [], list_id: w.list_id || null, ...extra});
 
+/* ---- Lien d'invitation : #join=<réglages codés>  (envoyé par un proche, il évite de ressaisir l'URL et la clé) ---- */
+function applyJoinLink() {
+  const m = location.hash.match(/^#join=([A-Za-z0-9_-]+)/); if (!m) return null;
+  let res = null;
+  try {
+    const b = m[1].replace(/-/g, '+').replace(/_/g, '/'), o = JSON.parse(atob(b + '='.repeat((4 - b.length % 4) % 4)));
+    const u = cleanSbUrl(o.u), k = String(o.k || '').trim(), r = String(o.r || '').trim(), h = String(o.h || '').toLowerCase();
+    if (!/^https:\/\/[a-z0-9-]+\.supabase\.(co|in)$/i.test(u) || !k || keyProblem(k)) throw new Error('lien invalide');
+    lsSet('envies.cfg.SUPABASE_URL', u); lsSet('envies.cfg.SUPABASE_ANON_KEY', k);
+    if (/^https:\/\//i.test(r)) lsSet('envies.cfg.META_RELAY', r);
+    res = {handle: /^[a-z0-9_.]{3,24}$/.test(h) ? h : ''};
+  } catch (e) { console.warn(e); res = {bad: true}; }
+  history.replaceState(null, '', location.pathname + location.search + (res.handle ? '#/u/' + res.handle : ''));
+  return res;
+}
 async function boot() {
   let note = '';
+  const join = applyJoinLink();
   const sp = new URLSearchParams(location.search);
   const addU = extractUrl(sp.get('add') || sp.get('url') || sp.get('text') || '');
   if (['add', 'url', 'text', 'title'].some(k => sp.has(k))) { ['add', 'url', 'text', 'title'].forEach(k => sp.delete(k)); history.replaceState(null, '', location.pathname + (sp.toString() ? '?' + sp : '') + location.hash); }
@@ -497,7 +513,11 @@ async function boot() {
   try { const r = await store.init(); S.me = r.me; }
   catch (e) { note = friendlyErr(e); S.me = null; }
   const m = location.hash.match(/^#\/u\/([a-z0-9_.]+)/i);
-  if (m && cloud()) await openUser(m[1]); else await go('envies');
+  if (join && join.bad) note = 'Ce lien d’invitation est incomplet ou abîmé : demande-en un nouveau.';
+  if (join && !join.bad && cloud() && !S.me) {   // invité : on l'amène directement à la création de compte
+    await go('envies'); if (join.handle) S.pendingUser = join.handle;
+    openAuth('signup', 'Bienvenue ! Crée ton compte' + (join.handle ? ' pour voir les envies de @' + join.handle : '') + '.');
+  } else if (m && cloud()) await openUser(m[1]); else await go('envies');
   if (note) toast(note, 6000);
   if (addU) { if (cloud() && !S.me) { S.pendingAdd = addU; openAuth('login', 'Connecte-toi pour ajouter ce produit'); } else openAdd(addU); }
 }
@@ -924,6 +944,7 @@ function openAuth(mode = 'login', hint = '') {
       closeSheet(); await go('envies');
       toast(wanted && S.me.handle !== wanted ? 'Ce pseudo était pris : tu es @' + S.me.handle : 'Connecté ✓', 4000);
       if (S.pendingAdd) { const u = S.pendingAdd; S.pendingAdd = ''; openAdd(u); }
+      else if (S.pendingUser) { const h = S.pendingUser; S.pendingUser = ''; if (h !== S.me.handle) openUser(h); }
     } catch (e) { busy = false; b.disabled = false; err(friendlyErr(e)); }
   };
   $('#u_go', sh).onclick = submit;
@@ -941,6 +962,7 @@ function openMenu() {
   const bm = `javascript:(function(){window.open('${appUrl}?add='+encodeURIComponent(location.href),'_blank')})()`;
   openSheet(`<h2>Menu</h2><p class="hint">${esc(CFG.APP_NAME)}</p>
     <div class="sec" style="margin-top:4px">Compte</div>${acc}
+    ${signedIn() ? `<div class="sec">Famille et amis</div><p class="mini" style="margin:0 2px 8px">Envoie ce lien à un proche : en l’ouvrant, il arrive directement sur la création de son compte, déjà branché, et tombe sur ton profil pour te suivre.</p><div class="links"><button class="link" data-act="inviteLink">Inviter un proche (copier / envoyer le lien)</button></div>` : ''}
     <div class="sec">Listes</div><div class="links"><button class="link" data-act="manageLists">Gérer mes listes</button></div>
     ${httpApp ? `<div class="sec">Ajouter depuis n’importe quel site (PC)</div><p class="mini" style="margin:0 2px 8px">Glisse ce bouton dans ta barre de favoris. Sur une page produit, clique dessus : l’envie s’ajoute.</p><a class="btn sm ghost bm" href="${esc(bm)}">＋ ${esc(CFG.APP_NAME)}</a>` : ''}
     <div class="sec">Sauvegarde</div><div class="links"><button class="link" data-act="exportJson">Exporter mes envies (fichier)</button><label class="link" style="cursor:pointer">Importer un fichier<input id="imp" type="file" accept="application/json,.json" hidden></label>${!cloud() && S.wishes.some(w => w.demo) ? '<button class="link" data-act="clearDemo">Retirer les exemples</button>' : ''}</div>
@@ -1062,6 +1084,12 @@ const A = {
   },
   delWish: async d => { if (!confirm('Supprimer cette envie ?')) return; await store.deleteWish(d.id); if (S.sel === d.id) S.sel = null; closeSheet(); await go('envies'); toast('Supprimée'); },
   shareWish: d => { const w = findWish(d.id); if (w) shareLink(w.title, safeHref(w.url) || location.origin + location.pathname); },
+  inviteLink: async () => {
+    const o = {u: cleanSbUrl(cfg('SUPABASE_URL')), k: cfg('SUPABASE_ANON_KEY'), r: cfg('META_RELAY'), h: S.me.handle};
+    if (!o.u || !o.k) return toast('Branche d’abord le compte (Réglages de connexion).', 4000);
+    const b = btoa(JSON.stringify(o)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    await shareLink('Rejoins-moi sur ' + CFG.APP_NAME, location.origin + location.pathname + '#join=' + b);
+  },
   shareMe: () => shareLink('Mes envies', location.origin + location.pathname + '#/u/' + S.me.handle),
   search: async () => { const q = ($('#fq') || {}).value || ''; S.fq = q.trim(); S.found = S.fq ? await store.searchUsers(S.fq) : null; render(); const i = $('#fq'); if (i) { i.focus(); i.setSelectionRange(i.value.length, i.value.length); } },
   openUser: d => openUser(d.handle),
