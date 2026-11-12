@@ -1,4 +1,4 @@
-# Envies — notes pour Claude (mémoire entre les sessions)
+# Envies — notes pour Claude (mémoire entre les sessions) 
 
 ## But
 Appli de liste d'envies perso d'Ilian, inspirée de Wantd (iOS seulement). Cible : MÊME COMPTE sur iPhone et PC
