@@ -320,13 +320,16 @@ async function getJson(u, ms = 9000) {
 async function fetchMeta(url) {
   const relay = cfg('META_RELAY');
   if (relay) {
-    try {
-      const j = await getJson(relay + (relay.includes('?') ? '&' : '?') + 'url=' + encodeURIComponent(url));
-      if (j && (j.title || (j.images && j.images.length))) {
-        return {title: j.title || '', brand: j.brand || '', shop: j.shop || host(url), price: parsePrice(j.price), currency: j.currency || 'EUR',
-                images: [...new Set((j.images || []).map(safeImg).filter(Boolean))].slice(0, 12), via: 'relay'};
-      }
-    } catch (e) { console.warn('relais', e); }
+    for (let essai = 0; essai < 2; essai++) {   // un 2e essai : le 1er appel à un site peut échouer à froid
+      try {
+        const j = await getJson(relay + (relay.includes('?') ? '&' : '?') + 'url=' + encodeURIComponent(url), essai ? 7000 : 9000);
+        if (j && (j.title || (j.images && j.images.length))) {
+          return {title: j.title || '', brand: j.brand || '', shop: j.shop || host(url), price: parsePrice(j.price), currency: j.currency || 'EUR',
+                  images: [...new Set((j.images || []).map(safeImg).filter(Boolean))].slice(0, 12), via: 'relay'};
+        }
+        break;   // réponse reçue mais vide : inutile de réessayer
+      } catch (e) { console.warn('relais', e); if (!essai) await new Promise(r => setTimeout(r, 700)); }
+    }
   }
   try {
     const j = await getJson('https://api.microlink.io/?url=' + encodeURIComponent(url));
@@ -874,10 +877,13 @@ function openAdd(prefill) {
   const sh = openSheet(`<h2>Ajouter une envie</h2><p class="hint">Colle le lien de n’importe quel produit</p>
     <div class="paste"><input id="a_url" class="fld" placeholder="https://…" inputmode="url" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="go"><button class="btn" id="a_paste" style="min-height:46px">Coller</button></div>
     <div id="a_body"><p style="text-align:center;margin:22px 0 0"><button class="link dim" data-act="addManual">Ou ajouter sans lien</button></p></div>`);
-  const inp = $('#a_url', sh); let running = false;
+  const inp = $('#a_url', sh); let running = false, lastUrl = '';
   const run = async () => {
     const url = extractUrl(inp.value); if (!url) { if (inp.value.trim()) toast('Ce n’est pas un lien valide'); return; }
-    if (running) return; running = true;
+    if (running) return; running = true; lastUrl = url;
+    try { await runWith(url); } finally { running = false; }
+  };
+  const runWith = async url => {
     inp.value = url; $('#a_body', sh).innerHTML = '<div class="reading"><span class="spin"></span>Lecture de la page…</div>';
     const dup = S.wishes.find(w => w.url && w.url.split('#')[0] === url.split('#')[0]);
     const meta = await fetchMeta(url);
@@ -892,7 +898,15 @@ function openAdd(prefill) {
     if (dup) toast('Attention : ce produit est déjà dans tes envies', 4000);
   };
   inp.addEventListener('keydown', e => { if (e.key === 'Enter') run(); });
-  inp.addEventListener('paste', () => setTimeout(run, 30));
+  // Collage : sur Android (Opera, Chrome…) le texte arrive parfois APRÈS l'événement « paste », ou via le clavier sans « paste ».
+  // On écoute donc aussi « input » quand beaucoup de texte arrive d'un coup, et on réessaie un peu plus tard.
+  const auto = () => { const u = extractUrl(inp.value); if (u && u !== lastUrl && !running) run(); };
+  let prevLen = 0;
+  inp.addEventListener('paste', () => { setTimeout(auto, 40); setTimeout(auto, 350); });
+  inp.addEventListener('input', e => {
+    const bulk = e.inputType === 'insertFromPaste' || (e.data && e.data.length > 8) || inp.value.length - prevLen > 8;
+    prevLen = inp.value.length; if (bulk) setTimeout(auto, 200);
+  });
   $('#a_paste', sh).onclick = async () => {
     try { const t = await navigator.clipboard.readText(); if (t) { inp.value = t; run(); } else toast('Le presse-papiers est vide'); }
     catch { inp.focus(); toast('Colle le lien dans la case (appui long → Coller)'); }
