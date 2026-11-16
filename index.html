@@ -85,7 +85,9 @@ svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stro
 .mhead .sp{flex:1}
 .mhead b{font-weight:600;font-size:14px;color:var(--mut)}
 .tabbar.mact{gap:8px;padding:6px}
-.tabbar.mact button{padding:12px 24px;font-weight:600;white-space:nowrap}
+.tabbar.mact button{padding:12px 18px;font-weight:600;white-space:nowrap}
+.tabbar.mact .mv{background:var(--acc);color:var(--accT)}
+.tabbar.mact .mv:disabled{opacity:.4;cursor:default}
 .tabbar.mact .del{background:#e5484d;color:#fff}
 .tabbar.mact .del:disabled{opacity:.4;cursor:default}
 .badge.done{left:8px;right:auto;background:rgba(11,11,12,.78);color:#f2f2f3;backdrop-filter:blur(6px)}
@@ -576,7 +578,7 @@ function viewHTML() {
   return viewEnvies();
 }
 function bottomNav() {
-  if (S.multi && S.view === 'envies') { const n = chkVis().length; return `<nav class="tabbar mact"><button data-act="endMulti">Annuler</button><button class="del" data-act="delMulti" ${n ? '' : 'disabled'}>Supprimer${n ? ' (' + n + ')' : ''}</button></nav>`; }
+  if (S.multi && S.view === 'envies') { const n = chkVis().length; return `<nav class="tabbar mact"><button data-act="endMulti">Annuler</button><button class="mv" data-act="moveMulti" ${n ? '' : 'disabled'}>Ranger${n ? ' (' + n + ')' : ''}</button><button class="del" data-act="delMulti" ${n ? '' : 'disabled'}>Supprimer${n ? ' (' + n + ')' : ''}</button></nav>`; }
   const v = S.view === 'user' ? 'amis' : S.view;
   return `<nav class="tabbar">${[['feed', 'Feed'], ['amis', 'Amis'], ['envies', 'Envies']].map(([k, t]) => `<button class="${v === k ? 'on' : ''}" data-act="tab" data-v="${k}">${t}</button>`).join('')}</nav>`;
 }
@@ -1085,6 +1087,20 @@ const A = {
   clearQ: () => { S.q = ''; render(); },
   newList: async () => { const n = await askText('Nouvelle liste', 'Ex. Anniversaire, Setup, Mode…', ''); if (!n) return; const l = await store.saveList({name: n}); S.lists.push(l); S.list = l.id; if (S.view !== 'envies') await go('envies'); else render(); },
   newListFor: async d => { const n = await askText('Nouvelle liste', 'Nom de la liste', ''); if (!n) return; const l = await store.saveList({name: n}); S.lists.push(l); await A.setWishList({id: d.id, list: l.id}); },
+  moveMulti: () => {
+    const ids = chkVis(); if (!ids.length) return;
+    const rows = [...S.lists, {id: '', name: 'Aucune liste'}].map(l => `<button class="pick" data-act="moveTo" data-list="${esc(l.id)}"><span class="dot"></span>${esc(l.name)}</button>`).join('');
+    openSheet(`<h2>Ranger ${ids.length} envie${ids.length > 1 ? 's' : ''} dans…</h2><p class="hint">Elles quitteront leur liste actuelle.</p>${rows}<button class="pick" data-act="moveToNew"><span style="width:18px;text-align:center">＋</span>Nouvelle liste…</button>`);
+  },
+  moveToNew: async () => { const n = await askText('Nouvelle liste', 'Ex. Pantalons, Setup, Mode…', ''); if (!n) return; try { const l = await store.saveList({name: n}); S.lists.push(l); await A.moveTo({list: l.id}); } catch (e) { toast(friendlyErr(e)); } },
+  moveTo: async d => {
+    const ids = chkVis(), target = d.list || null; if (!ids.length) return closeSheet();
+    const todo = ids.map(findWish).filter(w => w && (w.list_id || null) !== target);
+    try { for (const w of todo) await store.saveWish(wishPayload(w, {list_id: target})); } catch (e) { toast(friendlyErr(e)); }
+    closeSheet(); setMulti(false); await go('envies');
+    const nm = target ? (listName(target) || 'la liste') : 'aucune liste';
+    toast(todo.length ? todo.length + ' envie' + (todo.length > 1 ? 's' : '') + ' → ' + nm + ' ✓' : 'Déjà dans cette liste');
+  },
   setWishList: async d => { const w = findWish(d.id); await store.saveWish(wishPayload(w, {list_id: d.list || null})); closeSheet(); await go('envies'); toast('Rangé ✓'); },
   pickList: d => pickList(d.id),
   renList: async d => { const l = S.lists.find(x => x.id === d.id); const n = await askText('Renommer la liste', 'Nom', l.name); if (n) { await store.saveList({id: l.id, name: n, is_private: l.is_private}); await go('envies'); } manageLists(); },
