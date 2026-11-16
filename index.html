@@ -42,6 +42,12 @@ svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stro
 /* onglets de listes + barre d'outils */
 .chips{display:flex;gap:18px;align-items:center;overflow-x:auto;scrollbar-width:none;margin:0 2px 10px;padding-bottom:2px}
 .chips::-webkit-scrollbar{display:none}
+.chips .chip[data-act=setList]{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.chips .chip.drag{position:relative;z-index:5;color:var(--txt);transition:none;opacity:.95;filter:drop-shadow(0 4px 10px rgba(0,0,0,.45))}
+.chips.dragging{cursor:grabbing}
+.ordrow{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line)}
+.ordrow .t{flex:1;min-width:0;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ordrow .btn{min-width:48px}
 .chip{background:none;border:0;border-bottom:1px solid transparent;border-radius:0;padding:4px 0;color:var(--mut);white-space:nowrap;font-size:15px}
 .chip.on{color:var(--txt);border-color:var(--txt)}
 .chip .n{opacity:.55;margin-left:5px;font-size:12px}
@@ -435,6 +441,7 @@ async function makeSupaStore() {
     async deleteWish(id) { ck(await sb.from('wishes').delete().eq('id', id)); },
     async deleteWishes(ids) { ck(await sb.from('wishes').delete().in('id', ids)); },
     async myLists() { return ck(await sb.from('lists').select('*').eq('owner_id', me.id).order('created_at')); },
+    async saveListOrder(ids) { await Promise.all(ids.map((id, i) => sb.from('lists').update({position: i}).eq('id', id).then(r => ck(r)))); },
     async saveList(l) {
       if (l.id) return ck(await sb.from('lists').update({name: l.name, is_private: !!l.is_private}).eq('id', l.id).select().single());
       return ck(await sb.from('lists').insert({name: l.name, is_private: !!l.is_private}).select().single());
@@ -486,6 +493,22 @@ const isMine = w => store.kind === 'local' || (S.me && w.owner_id === S.me.id);
 const shopOf = w => w.brand || w.shop || host(w.url) || '';
 const priceTxt = w => w.price != null && w.price !== '' ? money(w.price, w.currency) : '';
 const findWish = id => [...S.wishes, ...S.feed, ...S.userWishes].find(w => w.id === id);
+function orderLists(a) {
+  let loc = []; try { loc = JSON.parse(lsGet('envies.listOrder') || '[]'); } catch {}
+  const r = l => l.position != null ? l.position : (loc.includes(l.id) ? loc.indexOf(l.id) : 1e6);
+  return [...a].sort((x, y) => r(x) - r(y) || String(x.created_at || '').localeCompare(String(y.created_at || '')));
+}
+let _ordT = null;
+function persistListOrder(now) {
+  const ids = S.lists.map(l => l.id);
+  S.lists.forEach((l, i) => { l.position = i; });
+  lsSet('envies.listOrder', JSON.stringify(ids));
+  if (!store.saveListOrder) return;
+  clearTimeout(_ordT);
+  const run = async () => { try { await store.saveListOrder(ids); } catch (e) { console.warn(e); if (!S._ordWarned) { S._ordWarned = 1; toast('Ordre gardé sur cet appareil seulement (colonne « position » absente dans Supabase).', 6000); } } };
+  if (now) return run(); _ordT = setTimeout(run, 500);
+}
+function moveListTo(ids) { const m = new Map(S.lists.map(l => [l.id, l])); S.lists = ids.map(id => m.get(id)).filter(Boolean); persistListOrder(); }
 const listName = id => { const l = S.lists.find(x => x.id === id); return l ? l.name : ''; };
 const wishPayload = (w, extra = {}) => ({id: w.id, title: w.title, brand: w.brand, shop: w.shop, price: w.price, currency: w.currency, note: w.note, url: w.url, image_url: w.image_url, images: w.images || [], list_id: w.list_id || null, ...extra});
 
@@ -533,7 +556,7 @@ async function go(view, quiet) {
   try {
     if (view === 'envies') {
       if (!S.me) { S.wishes = []; S.lists = []; }
-      else { [S.wishes, S.lists] = await Promise.all([store.myWishes(), store.myLists()]); }
+      else { [S.wishes, S.lists] = await Promise.all([store.myWishes(), store.myLists()]); S.lists = orderLists(S.lists); }
       S.localCount = cloud() ? makeLocalStore()._raw().wishes.filter(w => !w.demo).length : 0;
       if (S.list !== 'all' && !S.lists.some(l => l.id === S.list)) S.list = 'all';
       if (S.sel && !S.wishes.some(w => w.id === S.sel)) S.sel = null;
@@ -994,12 +1017,25 @@ function openCfg() {
     <p class="mini" style="margin:10px 2px 0">⚠️ Ne mets jamais la clé « secret » ou « service_role » : l’appli la refuse.</p><div class="err" id="c_err"></div>
     <div class="actions"><button class="btn ghost" data-act="closeSheet">Annuler</button><button class="btn" data-act="saveCfg">Enregistrer</button></div>`);
 }
-function manageLists() {
-  const rows = S.lists.length ? S.lists.map(l => `<div class="person" style="flex-wrap:wrap"><div class="t"><b>${esc(l.name)}</b><span>${l.is_private ? 'Privée : invisible pour tes amis' : 'Visible par tes amis'}</span></div>
+function manageLists(reorder) {
+  if (reorder && S.lists.length < 2) reorder = false;
+  let rows, head, foot;
+  if (reorder) {
+    const n = S.lists.length;
+    rows = S.lists.map((l, k) => `<div class="ordrow"><div class="t">${esc(l.name)}${l.is_private ? ' 🔒' : ''}</div>
+      <button class="btn sm ghost" data-act="listUp" data-id="${esc(l.id)}" ${k === 0 ? 'disabled' : ''} aria-label="Monter ${esc(l.name)}">↑</button>
+      <button class="btn sm ghost" data-act="listDown" data-id="${esc(l.id)}" ${k === n - 1 ? 'disabled' : ''} aria-label="Descendre ${esc(l.name)}">↓</button></div>`).join('');
+    head = '<h2>Ordre des listes</h2><p class="hint">Touche ↑ ou ↓ pour déplacer une liste. Astuce : sur l’écran principal, reste appuyé sur une liste puis glisse-la.</p>';
+    foot = '<div class="actions"><button class="btn" data-act="listsDone">Terminé</button></div>';
+  } else {
+    rows = S.lists.length ? S.lists.map(l => `<div class="person" style="flex-wrap:wrap"><div class="t"><b>${esc(l.name)}</b><span>${l.is_private ? 'Privée : invisible pour tes amis' : 'Visible par tes amis'}</span></div>
       <button class="btn sm ghost" data-act="renList" data-id="${esc(l.id)}">Renommer</button>
       ${cloud() ? `<button class="btn sm ghost" data-act="privList" data-id="${esc(l.id)}">${l.is_private ? 'Rendre visible' : 'Rendre privée'}</button>` : ''}
       <button class="btn sm ghost" data-act="delList" data-id="${esc(l.id)}" aria-label="Supprimer la liste">✕</button></div>`).join('') : '<p class="mut" style="text-align:center">Aucune liste pour l’instant.</p>';
-  openSheet(`<h2>Mes listes</h2><p class="hint">Supprimer une liste ne supprime pas ses envies.</p>${rows}<div class="actions"><button class="btn" data-act="newList">Nouvelle liste</button></div>`);
+    head = '<h2>Mes listes</h2><p class="hint">Supprimer une liste ne supprime pas ses envies.</p>';
+    foot = `<div class="actions">${S.lists.length > 1 ? '<button class="btn ghost" data-act="reorderLists">⇅ Réorganiser</button>' : ''}<button class="btn" data-act="newList">Nouvelle liste</button></div>`;
+  }
+  openSheet(head + rows + foot);
 }
 async function exportJson() {
   const data = {app: CFG.APP_NAME, version: 1, exported_at: new Date().toISOString(), lists: S.lists, wishes: S.wishes.filter(w => !w.demo).map(w => { const x = {...w}; delete x.owner; return x; })};
@@ -1104,6 +1140,10 @@ const A = {
   setWishList: async d => { const w = findWish(d.id); await store.saveWish(wishPayload(w, {list_id: d.list || null})); closeSheet(); await go('envies'); toast('Rangé ✓'); },
   pickList: d => pickList(d.id),
   renList: async d => { const l = S.lists.find(x => x.id === d.id); const n = await askText('Renommer la liste', 'Nom', l.name); if (n) { await store.saveList({id: l.id, name: n, is_private: l.is_private}); await go('envies'); } manageLists(); },
+  reorderLists: () => manageLists(true),
+  listUp: d => { const ids = S.lists.map(l => l.id), k = ids.indexOf(d.id); if (k > 0) { [ids[k - 1], ids[k]] = [ids[k], ids[k - 1]]; moveListTo(ids); } manageLists(true); },
+  listDown: d => { const ids = S.lists.map(l => l.id), k = ids.indexOf(d.id); if (k >= 0 && k < ids.length - 1) { [ids[k + 1], ids[k]] = [ids[k], ids[k + 1]]; moveListTo(ids); } manageLists(true); },
+  listsDone: async () => { persistListOrder(true); closeSheet(true); render(); manageLists(); },
   privList: async d => { const l = S.lists.find(x => x.id === d.id); await store.saveList({id: l.id, name: l.name, is_private: !l.is_private}); await go('envies'); manageLists(); },
   delList: async d => { if (!confirm('Supprimer cette liste ? Ses envies restent dans « Tout ».')) return; await store.deleteList(d.id); await go('envies'); manageLists(); },
   doneWish: async d => { const w = findWish(d.id); await store.saveWish(wishPayload(w, {fulfilled: !w.fulfilled})); closeSheet(); await go('envies'); toast(w.fulfilled ? 'Remise dans tes envies' : 'Envie exaucée 🎉'); },
@@ -1145,6 +1185,57 @@ const A = {
     location.reload();
   },
 };
+
+/* ---------- réorganiser les listes : appui long puis glisser (écran principal) ---------- */
+(() => {
+  let box = null, el = null, timer = null, drag = null, sx = 0, sy = 0, lx = 0, scroller = null, lastEnd = 0;
+  const HOLD = 450;
+  const others = () => [...box.querySelectorAll('.chip[data-act=setList]')].filter(c => c.dataset.id !== 'all');
+  const place = x => { const c = drag.el; c.style.transform = ''; const nat = c.getBoundingClientRect().left; c.style.transform = 'translateX(' + (x - drag.off - nat) + 'px) scale(1.07)'; };
+  const step = x => {
+    lx = x; place(x);
+    const c = drag.el, r = c.getBoundingClientRect(), cx = r.left + r.width / 2, a = others(), i = a.indexOf(c), nx = a[i + 1], pv = a[i - 1];
+    if (nx && cx > nx.getBoundingClientRect().left + nx.offsetWidth / 2) { nx.after(c); place(x); }
+    else if (pv && cx < pv.getBoundingClientRect().left + pv.offsetWidth / 2) { pv.before(c); place(x); }
+  };
+  const begin = () => {
+    timer = null; if (!el || !box) return;
+    drag = {el, off: sx - el.getBoundingClientRect().left}; lx = sx;
+    el.classList.add('drag'); box.classList.add('dragging');
+    try { navigator.vibrate && navigator.vibrate(15); } catch {}
+    scroller = setInterval(() => {
+      if (!drag) return; const r = box.getBoundingClientRect();
+      if (lx > r.right - 36) { box.scrollLeft += 9; step(lx); } else if (lx < r.left + 36) { box.scrollLeft -= 9; step(lx); }
+    }, 16);
+  };
+  const finish = commit => {
+    clearTimeout(timer); timer = null; clearInterval(scroller); scroller = null;
+    if (drag) {
+      const c = drag.el; c.style.transform = ''; c.classList.remove('drag'); box.classList.remove('dragging');
+      lastEnd = Date.now(); drag = null;
+      if (commit) { const ids = others().map(x => x.dataset.id); if (ids.join() !== S.lists.map(l => l.id).join()) moveListTo(ids); }
+      else render();
+    }
+    el = null; box = null;
+  };
+  const down = (target, x, y) => {
+    if (S.view !== 'envies' || S.multi || S.lists.length < 2) return;
+    const c = target.closest && target.closest('.chips .chip[data-act=setList]'); if (!c || c.dataset.id === 'all') return;
+    el = c; box = c.closest('.chips'); sx = x; sy = y; timer = setTimeout(begin, HOLD);
+  };
+  const move = (x, y, ev) => {
+    if (drag) { if (ev.cancelable) ev.preventDefault(); step(x); return; }
+    if (timer && (Math.abs(x - sx) > 9 || Math.abs(y - sy) > 9)) { clearTimeout(timer); timer = null; el = null; box = null; }
+  };
+  document.addEventListener('touchstart', e => { if (e.touches.length === 1) down(e.target, e.touches[0].clientX, e.touches[0].clientY); else finish(false); }, {passive: true});
+  document.addEventListener('touchmove', e => { if (e.touches.length === 1) move(e.touches[0].clientX, e.touches[0].clientY, e); }, {passive: false});
+  document.addEventListener('touchend', () => finish(true)); document.addEventListener('touchcancel', () => finish(true));
+  document.addEventListener('mousedown', e => { if (e.button === 0) down(e.target, e.clientX, e.clientY); });
+  document.addEventListener('mousemove', e => move(e.clientX, e.clientY, e));
+  document.addEventListener('mouseup', () => finish(true));
+  document.addEventListener('contextmenu', e => { if (e.target.closest && e.target.closest('.chips .chip[data-act=setList]') && (timer || drag)) e.preventDefault(); });
+  document.addEventListener('click', e => { if (Date.now() - lastEnd < 450 && e.target.closest && e.target.closest('.chips')) { e.stopPropagation(); e.preventDefault(); } }, true);
+})();
 
 /* ---------- événements ---------- */
 document.addEventListener('click', e => {
